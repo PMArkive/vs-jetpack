@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 import inspect
+
 from functools import partial, wraps
 from typing import Any, Callable, TypeGuard, cast, overload
 
 import vapoursynth as vs
+
 from jetpytools import CustomError, F, FuncExceptT
 
 from ..enums import FieldBased
-from ..exceptions import (FormatsRefClipMismatchError,
-                          ResolutionsRefClipMismatchError,
-                          UnsupportedFieldBasedError, VariableFormatError,
-                          VariableResolutionError)
+from ..exceptions import (
+    FormatsRefClipMismatchError, ResolutionsRefClipMismatchError, UnsupportedFieldBasedError,
+    VariableFormatError, VariableResolutionError
+)
 from ..types import ConstantFormatVideoNode
 
 __all__ = [

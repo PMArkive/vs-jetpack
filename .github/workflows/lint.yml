@@ -3,12 +3,7 @@ name: Lint Python code with Ruff & mypy
 on:
   push:
     branches:
-      - main
-    paths:
-      - '**.py'
-  pull_request:
-    paths:
-      - '**.py'
+      - debug_ci
 
 jobs:
   lint:
@@ -22,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: qoomon/actions--context@v2
+      - uses: arch1t3cht/actions--context@v3
         id: context
       - uses: tj-actions/branch-names@v8
         id: branch-names

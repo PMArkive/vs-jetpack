@@ -3,12 +3,7 @@ name: Lint Python code with Ruff & mypy
 on:
   push:
     branches:
-      - main
-    paths:
-      - '**.py'
-  pull_request:
-    paths:
-      - '**.py'
+      - ci-test
 
 jobs:
   lint:
@@ -24,6 +19,9 @@ jobs:
 
       - uses: qoomon/actions--context@v2
         id: context
+        with:
+          workflow-context: lint, ${{ toJSON(matrix) }}
+
       - uses: tj-actions/branch-names@v8
         id: branch-names
 

@@ -366,4 +366,5 @@ class _rekt_partial:
             clip.std.CropAbs(clip.width, bottom, y=clip.height - bottom) if bottom else None,
         ])))
 
+    rel = __call__
 rekt_partial = _rekt_partial()

@@ -367,4 +367,30 @@ class _rekt_partial:
         ])))
 
     rel = __call__
+
+    def abs(
+        self,
+        clip: vs.VideoNode,
+        func: Callable[Concatenate[vs.VideoNode, P], ConstantFormatVideoNode],
+        width: int, height: int, offset_x: int = 0, offset_y: int = 0,
+        *args: P.args, **kwargs: P.kwargs
+    ) -> ConstantFormatVideoNode:
+        """
+        Creates a rectangular mask to apply fixes only within the masked area,
+        significantly speeding up filters like anti-aliasing and scaling.
+
+        :param clip:            The source video clip to which the mask will be applied.
+        :param func:            The function to be applied within the masked area.
+        :param width:           The width of the rectangular mask.
+        :param height:          The height of the rectangular mask.
+        :param offset_x:        The horizontal offset of the mask from the top-left corner, defaults to 0.
+        :param offset_y:        The vertical offset of the mask from the top-left corner, defaults to 0.
+        :return:                A new clip with the applied mask.
+        """
+        return self.__call__(
+            clip, func, offset_x, clip.width - width - offset_x, offset_y, clip.height - height - offset_y,
+            *args, **kwargs
+        )
+
+
 rekt_partial = _rekt_partial()

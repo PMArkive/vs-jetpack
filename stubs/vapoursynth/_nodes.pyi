@@ -76,7 +76,7 @@ class _Plugin_akarin_VideoNode_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: bs
 
 _ReturnDict_bs_TrackInfo = TypedDict("_ReturnDict_bs_TrackInfo", {"mediatype": int, "mediatypestr": _DataType, "codec": int, "codecstr": _DataType, "disposition": int, "dispositionstr": _DataType})
@@ -93,7 +93,7 @@ class _Plugin_bs_Core_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: cs
 
 class _Plugin_cs_Core_Bound(Plugin):
@@ -107,7 +107,7 @@ class _Plugin_cs_VideoNode_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: d2v
 
 class _Plugin_d2v_Core_Bound(Plugin):
@@ -116,7 +116,7 @@ class _Plugin_d2v_Core_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: descale
 
 class _Plugin_descale_Core_Bound(Plugin):
@@ -155,7 +155,7 @@ class _Plugin_descale_VideoNode_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: dgdecodenv
 
 class _Plugin_dgdecodenv_Core_Bound(Plugin):
@@ -164,7 +164,7 @@ class _Plugin_dgdecodenv_Core_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: dvdsrc2
 
 class _Plugin_dvdsrc2_Core_Bound(Plugin):
@@ -177,7 +177,54 @@ class _Plugin_dvdsrc2_Core_Bound(Plugin):
 
 # end implementation
 
-    
+
+
+# implementation: eedi2
+
+class _Plugin_eedi2_Core_Bound(Plugin):
+    """This class implements the module definitions for the "eedi2" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def EEDI2(self, clip: VideoNode, field: int, mthresh: int | None = None, lthresh: int | None = None, vthresh: int | None = None, estr: int | None = None, dstr: int | None = None, maxd: int | None = None, map: int | None = None, nt: int | None = None, pp: int | None = None) -> ConstantFormatVideoNode: ...
+
+class _Plugin_eedi2_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "eedi2" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def EEDI2(self, field: int, mthresh: int | None = None, lthresh: int | None = None, vthresh: int | None = None, estr: int | None = None, dstr: int | None = None, maxd: int | None = None, map: int | None = None, nt: int | None = None, pp: int | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
+
+# implementation: eedi2cuda
+
+class _Plugin_eedi2cuda_Core_Bound(Plugin):
+    """This class implements the module definitions for the "eedi2cuda" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def AA2(self, clip: VideoNode, mthresh: int | None = None, lthresh: int | None = None, vthresh: int | None = None, estr: int | None = None, dstr: int | None = None, maxd: int | None = None, map: int | None = None, nt: int | None = None, pp: int | None = None, planes: _SingleAndSequence[int] | None = None, num_streams: int | None = None, device_id: int | None = None) -> ConstantFormatVideoNode: ...
+    def BuildConfig(self) -> _DataType: ...
+    def EEDI2(self, clip: VideoNode, field: int, mthresh: int | None = None, lthresh: int | None = None, vthresh: int | None = None, estr: int | None = None, dstr: int | None = None, maxd: int | None = None, map: int | None = None, nt: int | None = None, pp: int | None = None, planes: _SingleAndSequence[int] | None = None, num_streams: int | None = None, device_id: int | None = None) -> ConstantFormatVideoNode: ...
+    def Enlarge2(self, clip: VideoNode, mthresh: int | None = None, lthresh: int | None = None, vthresh: int | None = None, estr: int | None = None, dstr: int | None = None, maxd: int | None = None, map: int | None = None, nt: int | None = None, pp: int | None = None, planes: _SingleAndSequence[int] | None = None, num_streams: int | None = None, device_id: int | None = None) -> ConstantFormatVideoNode: ...
+
+class _Plugin_eedi2cuda_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "eedi2cuda" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def AA2(self, mthresh: int | None = None, lthresh: int | None = None, vthresh: int | None = None, estr: int | None = None, dstr: int | None = None, maxd: int | None = None, map: int | None = None, nt: int | None = None, pp: int | None = None, planes: _SingleAndSequence[int] | None = None, num_streams: int | None = None, device_id: int | None = None) -> ConstantFormatVideoNode: ...
+    def EEDI2(self, field: int, mthresh: int | None = None, lthresh: int | None = None, vthresh: int | None = None, estr: int | None = None, dstr: int | None = None, maxd: int | None = None, map: int | None = None, nt: int | None = None, pp: int | None = None, planes: _SingleAndSequence[int] | None = None, num_streams: int | None = None, device_id: int | None = None) -> ConstantFormatVideoNode: ...
+    def Enlarge2(self, mthresh: int | None = None, lthresh: int | None = None, vthresh: int | None = None, estr: int | None = None, dstr: int | None = None, maxd: int | None = None, map: int | None = None, nt: int | None = None, pp: int | None = None, planes: _SingleAndSequence[int] | None = None, num_streams: int | None = None, device_id: int | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
+
+# implementation: eedi3m
+
+class _Plugin_eedi3m_Core_Bound(Plugin):
+    """This class implements the module definitions for the "eedi3m" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def EEDI3(self, clip: VideoNode, field: int, dh: int | None = None, planes: _SingleAndSequence[int] | None = None, alpha: float | None = None, beta: float | None = None, gamma: float | None = None, nrad: int | None = None, mdis: int | None = None, hp: int | None = None, ucubic: int | None = None, cost3: int | None = None, vcheck: int | None = None, vthresh0: float | None = None, vthresh1: float | None = None, vthresh2: float | None = None, sclip: VideoNode | None = None, mclip: VideoNode | None = None, opt: int | None = None) -> ConstantFormatVideoNode: ...
+    def EEDI3CL(self, clip: VideoNode, field: int, dh: int | None = None, planes: _SingleAndSequence[int] | None = None, alpha: float | None = None, beta: float | None = None, gamma: float | None = None, nrad: int | None = None, mdis: int | None = None, hp: int | None = None, ucubic: int | None = None, cost3: int | None = None, vcheck: int | None = None, vthresh0: float | None = None, vthresh1: float | None = None, vthresh2: float | None = None, sclip: VideoNode | None = None, opt: int | None = None, device: int | None = None, list_device: int | None = None, info: int | None = None) -> ConstantFormatVideoNode: ...
+
+class _Plugin_eedi3m_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "eedi3m" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def EEDI3(self, field: int, dh: int | None = None, planes: _SingleAndSequence[int] | None = None, alpha: float | None = None, beta: float | None = None, gamma: float | None = None, nrad: int | None = None, mdis: int | None = None, hp: int | None = None, ucubic: int | None = None, cost3: int | None = None, vcheck: int | None = None, vthresh0: float | None = None, vthresh1: float | None = None, vthresh2: float | None = None, sclip: VideoNode | None = None, mclip: VideoNode | None = None, opt: int | None = None) -> ConstantFormatVideoNode: ...
+    def EEDI3CL(self, field: int, dh: int | None = None, planes: _SingleAndSequence[int] | None = None, alpha: float | None = None, beta: float | None = None, gamma: float | None = None, nrad: int | None = None, mdis: int | None = None, hp: int | None = None, ucubic: int | None = None, cost3: int | None = None, vcheck: int | None = None, vthresh0: float | None = None, vthresh1: float | None = None, vthresh2: float | None = None, sclip: VideoNode | None = None, opt: int | None = None, device: int | None = None, list_device: int | None = None, info: int | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
+
 # implementation: ffms2
 
 class _Plugin_ffms2_Core_Bound(Plugin):
@@ -190,7 +237,7 @@ class _Plugin_ffms2_Core_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: fmtc
 
 class _Plugin_fmtc_Core_Bound(Plugin):
@@ -232,7 +279,7 @@ class _Plugin_hysteresis_VideoNode_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: imwri
 
 class _Plugin_imwri_Core_Bound(Plugin):
@@ -246,7 +293,7 @@ class _Plugin_imwri_VideoNode_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: lsmas
 
 class _Plugin_lsmas_Core_Bound(Plugin):
@@ -256,7 +303,7 @@ class _Plugin_lsmas_Core_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: placebo
 
 class _Plugin_placebo_Core_Bound(Plugin):
@@ -275,7 +322,7 @@ class _Plugin_placebo_VideoNode_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: resize
 
 class _Plugin_resize_Core_Bound(Plugin):
@@ -298,31 +345,31 @@ class _Plugin_resize_Core_Bound(Plugin):
     @overload
     def Lanczos(self, clip: VideoNode, width: int | None = None, height: int | None = None, format: int = ..., matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
-    def Lanczos(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...    
+    def Lanczos(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...
     @overload
     def Point(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...
     @overload
     def Point(self, clip: VideoNode, width: int | None = None, height: int | None = None, format: int = ..., matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
-    def Point(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...    
+    def Point(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...
     @overload
     def Spline16(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...
     @overload
     def Spline16(self, clip: VideoNode, width: int | None = None, height: int | None = None, format: int = ..., matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
-    def Spline16(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...  
+    def Spline16(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...
     @overload
     def Spline36(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...
     @overload
     def Spline36(self, clip: VideoNode, width: int | None = None, height: int | None = None, format: int = ..., matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
-    def Spline36(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...  
+    def Spline36(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...
     @overload
     def Spline64(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...
     @overload
     def Spline64(self, clip: VideoNode, width: int | None = None, height: int | None = None, format: int = ..., matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
-    def Spline64(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...    
+    def Spline64(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNodeT: ...
 
 class _Plugin_resize_VideoNode_Bound(Plugin):
     """This class implements the module definitions for the "resize" VapourSynth plugin.\n\n*This class cannot be imported.*"""
@@ -344,36 +391,36 @@ class _Plugin_resize_VideoNode_Bound(Plugin):
     @overload
     def Lanczos(self, width: int | None = None, height: int | None = None, format: int = ..., matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
-    def Lanczos(self, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...    
+    def Lanczos(self, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...
     @overload
     def Point(self, width: int | None = None, height: int | None = None, format: None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...
     @overload
     def Point(self, width: int | None = None, height: int | None = None, format: int = ..., matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
-    def Point(self, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...    
+    def Point(self, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...
     @overload
     def Spline16(self, width: int | None = None, height: int | None = None, format: None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...
     @overload
     def Spline16(self, width: int | None = None, height: int | None = None, format: int = ..., matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
-    def Spline16(self, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...  
+    def Spline16(self, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...
     @overload
     def Spline36(self, width: int | None = None, height: int | None = None, format: None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...
     @overload
     def Spline36(self, width: int | None = None, height: int | None = None, format: int = ..., matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
-    def Spline36(self, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...  
+    def Spline36(self, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...
     @overload
     def Spline64(self, width: int | None = None, height: int | None = None, format: None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...
     @overload
     def Spline64(self, width: int | None = None, height: int | None = None, format: int = ..., matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
-    def Spline64(self, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...    
+    def Spline64(self, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, approximate_gamma: int | None = None) -> VideoNode: ...
 
 
 # end implementation
 
-    
+
 # implementation: resize2
 
 class _Plugin_resize2_Core_Bound(Plugin):
@@ -422,7 +469,7 @@ class _Plugin_resize2_Core_Bound(Plugin):
     def Spline64(self, clip: VideoNodeT, width: int | None = None, height: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, filter_param_a: float | None = None, filter_param_b: float | None = None, resample_filter_uv: _DataType | None = None, filter_param_a_uv: float | None = None, filter_param_b_uv: float | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, force: int | None = None, force_h: int | None = None, force_v: int | None = None) -> VideoNodeT: ...
 
     def Bob(self, clip: VideoNode, filter: _DataType | None = None, tff: int | None = None, format: int | None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None) -> ConstantFormatVideoNode: ...
-  
+
     @overload
     def Custom(self, clip: VideoNodeT, custom_kernel: _VSMapValueCallback[_VapourSynthMapValue], taps: int, width: int | None = None, height: int | None = None, format: None = None, matrix: int | None = None, matrix_s: _DataType | None = None, transfer: int | None = None, transfer_s: _DataType | None = None, primaries: int | None = None, primaries_s: _DataType | None = None, range: int | None = None, range_s: _DataType | None = None, chromaloc: int | None = None, chromaloc_s: _DataType | None = None, matrix_in: int | None = None, matrix_in_s: _DataType | None = None, transfer_in: int | None = None, transfer_in_s: _DataType | None = None, primaries_in: int | None = None, primaries_in_s: _DataType | None = None, range_in: int | None = None, range_in_s: _DataType | None = None, chromaloc_in: int | None = None, chromaloc_in_s: _DataType | None = None, dither_type: _DataType | None = None, cpu_type: _DataType | None = None, prefer_props: int | None = None, src_left: float | None = None, src_top: float | None = None, src_width: float | None = None, src_height: float | None = None, nominal_luminance: float | None = None, force: int | None = None, force_h: int | None = None, force_v: int | None = None) -> VideoNodeT: ...
     @overload
@@ -532,7 +579,7 @@ class _Plugin_rgvs_VideoNode_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: scxvid
 
 class _Plugin_scxvid_Core_Bound(Plugin):
@@ -545,7 +592,28 @@ class _Plugin_scxvid_VideoNode_Bound(Plugin):
 
 # end implementation
 
-    
+
+# implementation: sneedif
+
+_ReturnDict_sneedif_DeviceInfo = TypedDict("_ReturnDict_sneedif_DeviceInfo", {"name": _DataType, "vendor": _DataType, "profile": _DataType, "version": _DataType, "max_compute_units": int, "max_work_group_size": int, "max_work_item_sizes": _SingleAndSequence[int], "image2D_max_width": int, "image2D_max_height": int, "image_support": int, "global_memory_cache_type": _DataType, "global_memory_cache": int, "global_memory_size": int, "max_constant_buffer_size": int, "max_constant_arguments": int, "local_memory_type": _DataType, "local_memory_size": int, "available": int, "compiler_available": int, "linker_available": int, "opencl_c_version": _DataType, "image_max_buffer_size": int})
+_ReturnDict_sneedif_ListDevices = TypedDict("_ReturnDict_sneedif_ListDevices", {"numDevices": int, "deviceNames": _SingleAndSequence[_DataType], "platformNames": _SingleAndSequence[_DataType]})
+_ReturnDict_sneedif_PlatformInfo = TypedDict("_ReturnDict_sneedif_PlatformInfo", {"profile": _DataType, "version": _DataType, "name": _DataType, "vendor": _DataType})
+
+
+class _Plugin_sneedif_Core_Bound(Plugin):
+    """This class implements the module definitions for the "sneedif" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def DeviceInfo(self, device: int | None = None) -> '_ReturnDict_sneedif_DeviceInfo': ...
+    def ListDevices(self) -> '_ReturnDict_sneedif_ListDevices': ...
+    def NNEDI3(self, clip: VideoNode, field: int, dh: int | None = None, dw: int | None = None, planes: _SingleAndSequence[int] | None = None, nsize: int | None = None, nns: int | None = None, qual: int | None = None, etype: int | None = None, pscrn: int | None = None, transpose_first: int | None = None, device: int | None = None) -> ConstantFormatVideoNode: ...
+    def PlatformInfo(self, device: int | None = None) -> '_ReturnDict_sneedif_PlatformInfo': ...
+
+class _Plugin_sneedif_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "sneedif" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def NNEDI3(self, field: int, dh: int | None = None, dw: int | None = None, planes: _SingleAndSequence[int] | None = None, nsize: int | None = None, nns: int | None = None, qual: int | None = None, etype: int | None = None, pscrn: int | None = None, transpose_first: int | None = None, device: int | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
+
 # implementation: std
 
 class _Plugin_std_Core_Bound(Plugin):
@@ -570,7 +638,7 @@ class _Plugin_std_Core_Bound(Plugin):
     def BlankClip(self, clip: VideoNode | None = None, width: int | None = None, height: int | None = None, format: int | None = None, length: int | None = None, fpsnum: int | None = None, fpsden: int | None = None, color: _SingleAndSequence[float] | None = None, keep: int | None = None, varsize: int | None = None, varformat: int = ...) -> VideoNode: ...
     @overload
     def BlankClip(self, clip: VideoNode | None = None, width: int | None = None, height: int | None = None, format: int | None = None, length: int | None = None, fpsnum: int | None = None, fpsden: int | None = None, color: _SingleAndSequence[float] | None = None, keep: int | None = None, varsize: int | None = None, varformat: int | None = None) -> VideoNode: ...
-  
+
     def BoxBlur(self, clip: VideoNode, planes: _SingleAndSequence[int] | None = None, hradius: int | None = None, hpasses: int | None = None, vradius: int | None = None, vpasses: int | None = None) -> ConstantFormatVideoNode: ...
     def Cache(self, clip: VideoNode, size: int | None = None, fixed: int | None = None, make_linear: int | None = None) -> ConstantFormatVideoNode: ...
     def ClipToProp(self, clip: VideoNode, mclip: VideoNode, prop: _DataType | None = None) -> ConstantFormatVideoNode: ...
@@ -589,7 +657,7 @@ class _Plugin_std_Core_Bound(Plugin):
     def FrameEval(self, clip: VideoNodeT, eval: _VSMapValueCallback[_VapourSynthMapValue], prop_src: _SingleAndSequence[VideoNode] | None = None, clip_src: _SingleAndSequence[VideoNode] | None = None) -> VideoNodeT: ...
     def FreezeFrames(self, clip: VideoNodeT, first: _SingleAndSequence[int] | None = None, last: _SingleAndSequence[int] | None = None, replacement: _SingleAndSequence[int] | None = None) -> VideoNodeT: ...
     def Inflate(self, clip: VideoNode, planes: _SingleAndSequence[int] | None = None, threshold: float | None = None) -> ConstantFormatVideoNode: ...
-    
+
     @overload
     def Interleave(self, clips: _SingleAndSequence[VideoNode], extend: int | None = None, mismatch: None = None, modify_duration: int | None = None) -> ConstantFormatVideoNode: ...
     @overload
@@ -634,7 +702,7 @@ class _Plugin_std_Core_Bound(Plugin):
     def ShuffleChannels(self, clips: _SingleAndSequence[AudioNode], channels_in: _SingleAndSequence[int], channels_out: _SingleAndSequence[int]) -> AudioNode: ...
     def ShufflePlanes(self, clips: _SingleAndSequence[VideoNode], planes: _SingleAndSequence[int], colorfamily: int, prop_src: VideoNode | None = None) -> ConstantFormatVideoNode: ...
     def Sobel(self, clip: VideoNode, planes: _SingleAndSequence[int] | None = None, scale: float | None = None) -> ConstantFormatVideoNode: ...
-    
+
     @overload
     def Splice(self, clips: _SingleAndSequence[VideoNode], mismatch: None = None) -> ConstantFormatVideoNode: ...
     @overload
@@ -665,7 +733,7 @@ class _Plugin_std_VideoNode_Bound(Plugin, Generic[VideoNodeT]):
     def BlankClip(self, width: int | None = None, height: int | None = None, format: int | None = None, length: int | None = None, fpsnum: int | None = None, fpsden: int | None = None, color: _SingleAndSequence[float] | None = None, keep: int | None = None, varsize: int | None = None, varformat: int = ...) -> VideoNode: ...
     @overload
     def BlankClip(self, width: int | None = None, height: int | None = None, format: int | None = None, length: int | None = None, fpsnum: int | None = None, fpsden: int | None = None, color: _SingleAndSequence[float] | None = None, keep: int | None = None, varsize: int | None = None, varformat: int | None = None) -> VideoNodeT: ...
-    
+
     def BoxBlur(self, planes: _SingleAndSequence[int] | None = None, hradius: int | None = None, hpasses: int | None = None, vradius: int | None = None, vpasses: int | None = None) -> ConstantFormatVideoNode: ...
     def Cache(self, size: int | None = None, fixed: int | None = None, make_linear: int | None = None) -> ConstantFormatVideoNode: ...
     def ClipToProp(self, mclip: VideoNode, prop: _DataType | None = None) -> ConstantFormatVideoNode: ...
@@ -684,14 +752,14 @@ class _Plugin_std_VideoNode_Bound(Plugin, Generic[VideoNodeT]):
     def FrameEval(self, eval: _VSMapValueCallback[_VapourSynthMapValue], prop_src: _SingleAndSequence[VideoNode] | None = None, clip_src: _SingleAndSequence[VideoNode] | None = None) -> VideoNodeT: ...
     def FreezeFrames(self, first: _SingleAndSequence[int] | None = None, last: _SingleAndSequence[int] | None = None, replacement: _SingleAndSequence[int] | None = None) -> VideoNodeT: ...
     def Inflate(self, planes: _SingleAndSequence[int] | None = None, threshold: float | None = None) -> ConstantFormatVideoNode: ...
-    
+
     @overload
     def Interleave(self, extend: int | None = None, mismatch: int | None = None, modify_duration: None = None) -> VideoNodeT: ...
     @overload
     def Interleave(self, extend: int | None = None, mismatch: int | None = None, modify_duration: int = ...) -> VideoNode: ...
     @overload
     def Interleave(self, extend: int | None = None, mismatch: int | None = None, modify_duration: int | None = None) -> VideoNodeT: ...
-    
+
     def Invert(self, planes: _SingleAndSequence[int] | None = None) -> VideoNodeT: ...
     def InvertMask(self, planes: _SingleAndSequence[int] | None = None) -> VideoNodeT: ...
     def Levels(self, min_in: _SingleAndSequence[float] | None = None, max_in: _SingleAndSequence[float] | None = None, gamma: _SingleAndSequence[float] | None = None, min_out: _SingleAndSequence[float] | None = None, max_out: _SingleAndSequence[float] | None = None, planes: _SingleAndSequence[int] | None = None) -> ConstantFormatVideoNode: ...
@@ -814,7 +882,7 @@ class _Plugin_text_VideoNode_Bound(Plugin):
 
 # end implementation
 
-    
+
 # implementation: vszip
 
 class _Plugin_vszip_Core_Bound(Plugin):
@@ -884,7 +952,7 @@ class _Plugin_warpsf_VideoNode_Bound(Plugin):
 # end implementation
 
 
-    
+
 # implementation: wwxd
 
 class _Plugin_wwxd_Core_Bound(Plugin):
@@ -897,7 +965,19 @@ class _Plugin_wwxd_VideoNode_Bound(Plugin):
 
 # end implementation
 
-    
+
+# implementation: znedi3
+
+class _Plugin_znedi3_Core_Bound(Plugin):
+    """This class implements the module definitions for the "znedi3" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def nnedi3(self, clip: VideoNode, field: int, dh: int | None = None, planes: _SingleAndSequence[int] | None = None, nsize: int | None = None, nns: int | None = None, qual: int | None = None, etype: int | None = None, pscrn: int | None = None, opt: int | None = None, int16_prescreener: int | None = None, int16_predictor: int | None = None, exp: int | None = None, show_mask: int | None = None, x_nnedi3_weights_bin: _DataType | None = None, x_cpu: _DataType | None = None) -> ConstantFormatVideoNode: ...
+
+class _Plugin_znedi3_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "znedi3" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def nnedi3(self, field: int, dh: int | None = None, planes: _SingleAndSequence[int] | None = None, nsize: int | None = None, nns: int | None = None, qual: int | None = None, etype: int | None = None, pscrn: int | None = None, opt: int | None = None, int16_prescreener: int | None = None, int16_predictor: int | None = None, exp: int | None = None, show_mask: int | None = None, x_nnedi3_weights_bin: _DataType | None = None, x_cpu: _DataType | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
 # implementation: zsmooth
 
 class _Plugin_zsmooth_Core_Bound(Plugin):
@@ -1032,6 +1112,21 @@ class VideoNode(RawNode):
     def descale(self) -> _Plugin_descale_VideoNode_Bound:
         """Undo linear interpolation"""
     # end instance
+    # instance_bound_VideoNode: eedi2
+    @property
+    def eedi2(self) -> _Plugin_eedi2_VideoNode_Bound:
+        """EEDI2"""
+    # end instance
+    # instance_bound_VideoNode: eedi2cuda
+    @property
+    def eedi2cuda(self) -> _Plugin_eedi2cuda_VideoNode_Bound:
+        """EEDI2 filter using CUDA"""
+    # end instance
+    # instance_bound_VideoNode: eedi3m
+    @property
+    def eedi3m(self) -> _Plugin_eedi3m_VideoNode_Bound:
+        """Enhanced Edge Directed Interpolation 3"""
+    # end instance
     # instance_bound_VideoNode: fmtc
     @property
     def fmtc(self) -> _Plugin_fmtc_VideoNode_Bound:
@@ -1077,6 +1172,10 @@ class VideoNode(RawNode):
     def scxvid(self) -> _Plugin_scxvid_VideoNode_Bound:
         """VapourSynth Scxvid Plugin"""
     # end instance
+    @property
+    def sneedif(self) -> _Plugin_sneedif_VideoNode_Bound:
+        """Setsugen No Ensemble of Edge Directed Interpolation Functions"""
+    # end instance
     # instance_bound_VideoNode: std
     @property
     def std(self) -> _Plugin_std_VideoNode_Bound[VideoNode]:
@@ -1121,6 +1220,11 @@ class VideoNode(RawNode):
     @property
     def wwxd(self) -> _Plugin_wwxd_VideoNode_Bound:
         """Scene change detection approximately like Xvid's"""
+    # end instance
+    # instance_bound_VideoNode: znedi3
+    @property
+    def znedi3(self) -> _Plugin_znedi3_VideoNode_Bound:
+        """Neural network edge directed interpolation (3rd gen.)"""
     # end instance
     # instance_bound_VideoNode: zsmooth
     @property
@@ -1246,6 +1350,21 @@ class Core:
     def dvdsrc2(self) -> _Plugin_dvdsrc2_Core_Bound:
         """Dvdsrc 2nd tour"""
     # end instance
+    # instance_bound_Core: eedi2
+    @property
+    def eedi2(self) -> _Plugin_eedi2_Core_Bound:
+        """EEDI2"""
+    # end instance
+    # instance_bound_Core: eedi2cuda
+    @property
+    def eedi2cuda(self) -> _Plugin_eedi2cuda_Core_Bound:
+        """EEDI2 filter using CUDA"""
+    # end instance
+    # instance_bound_Core: eedi3m
+    @property
+    def eedi3m(self) -> _Plugin_eedi3m_Core_Bound:
+        """Enhanced Edge Directed Interpolation 3"""
+    # end instance
     # instance_bound_Core: ffms2
     @property
     def ffms2(self) -> _Plugin_ffms2_Core_Bound:
@@ -1301,6 +1420,11 @@ class Core:
     def scxvid(self) -> _Plugin_scxvid_Core_Bound:
         """VapourSynth Scxvid Plugin"""
     # end instance
+    # instance_bound_Core: sneedif
+    @property
+    def sneedif(self) -> _Plugin_sneedif_Core_Bound:
+        """Setsugen No Ensemble of Edge Directed Interpolation Functions"""
+    # end instance
     # instance_bound_Core: std
     @property
     def std(self) -> _Plugin_std_Core_Bound:
@@ -1344,6 +1468,11 @@ class Core:
     @property
     def wwxd(self) -> _Plugin_wwxd_Core_Bound:
         """Scene change detection approximately like Xvid's"""
+    # end instance
+    # instance_bound_Core: znedi3
+    @property
+    def znedi3(self) -> _Plugin_znedi3_Core_Bound:
+        """Neural network edge directed interpolation (3rd gen.)"""
     # end instance
     # instance_bound_Core: zsmooth
     @property

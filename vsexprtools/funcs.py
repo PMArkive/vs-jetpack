@@ -26,15 +26,11 @@ def expr_func(
     func = func or expr_func
 
     clips = list(clips) if isinstance(clips, Sequence) else [clips]
-    over_clips = len(clips) > 26
 
     if not complexpr_available:
-        if over_clips:
-            raise ExprVars._get_akarin_err('This function only works with akarin plugin!')(func=func)
-    elif over_clips and b'src26' not in vs.core.akarin.Version()['expr_features']:
+        raise ExprVars._get_akarin_err('This function only works with akarin plugin!')(func=func)
+    elif b'src26' not in vs.core.akarin.Version()['expr_features']:
         raise ExprVars._get_akarin_err('You need at least v0.96 of akarin plugin!')(func=func)
-    elif not ExprVars._check_akarin_version(0.96, 'g'):
-        raise ExprVars._get_akarin_err('You need at least v0.96g of akarin plugin!')(func=func)
 
     fmt = None if format is None else get_video_format(format).id
 

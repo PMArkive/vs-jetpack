@@ -158,15 +158,6 @@ class _ExprVars(Iterable[str]):
         return f'src{value}' if akarin else EXPR_VARS[value]
 
     @classmethod
-    def _check_akarin_version(cls, min_version: float, min_letter: str = '') -> bool:
-        version = core.akarin.Version()['version']
-        version_num, version_letter = float(version[:-1]), version[-1] if version[-1].isalpha() else ''
-
-        return version_num >= min_version and (
-            not version_letter or version_letter >= min_letter
-        )
-
-    @classmethod
     def _get_akarin_err(cls, message: str = 'You need the akarin plugin to run this function!') -> CustomRuntimeError:
         return CustomRuntimeError(f'{message}\nDownload it from https://github.com/AkarinVS/vapoursynth-plugin')
 

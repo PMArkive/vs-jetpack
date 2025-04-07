@@ -421,7 +421,7 @@ class MVTools(vs_object):
         vectors: MotionVectors | None = None, direction: MVDirection = MVDirection.BOTH,
         tr: int | None = None, scbehavior: bool | None = None,
         thsad: int | None = None, thsad2: int | None = None,
-        time: float | None = None, thscd: int | tuple[int | None, int | None] | None = None,
+        time: float | None = None, thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: Literal[True] = True, temporal_func: None = None
     ) -> tuple[vs.VideoNode, tuple[int, int]]:
         ...
@@ -432,7 +432,7 @@ class MVTools(vs_object):
         vectors: MotionVectors | None = None, direction: MVDirection = MVDirection.BOTH,
         tr: int | None = None, scbehavior: bool | None = None,
         thsad: int | None = None, thsad2: int | None = None,
-        time: float | None = None, thscd: int | tuple[int | None, int | None] | None = None,
+        time: float | None = None, thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: Literal[True] = True, temporal_func: VSFunction = ...
     ) -> vs.VideoNode:
         ...
@@ -443,7 +443,7 @@ class MVTools(vs_object):
         vectors: MotionVectors | None = None, direction: MVDirection = MVDirection.BOTH,
         tr: int | None = None, scbehavior: bool | None = None,
         thsad: int | None = None, thsad2: int | None = None,
-        time: float | None = None, thscd: int | tuple[int | None, int | None] | None = None,
+        time: float | None = None, thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: Literal[False] = False, temporal_func: None = None
     ) -> tuple[list[vs.VideoNode], list[vs.VideoNode]]:
         ...
@@ -453,7 +453,7 @@ class MVTools(vs_object):
         vectors: MotionVectors | None = None, direction: MVDirection = MVDirection.BOTH,
         tr: int | None = None, scbehavior: bool | None = None,
         thsad: int | None = None, thsad2: int | None = None,
-        time: float | None = None, thscd: int | tuple[int | None, int | None] | None = None,
+        time: float | None = None, thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: bool = True, temporal_func: VSFunction | None = None
     ) -> vs.VideoNode | tuple[list[vs.VideoNode], list[vs.VideoNode]] | tuple[vs.VideoNode, tuple[int, int]]:
         """
@@ -529,7 +529,7 @@ class MVTools(vs_object):
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, direction: MVDirection = MVDirection.BOTH,
         tr: int | None = None, time: float | None = None, mode: FlowMode | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None,
+        thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: Literal[True] = True, temporal_func: None = None
     ) -> tuple[vs.VideoNode, tuple[int, int]]:
         ...
@@ -539,7 +539,7 @@ class MVTools(vs_object):
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, direction: MVDirection = MVDirection.BOTH,
         tr: int | None = None, time: float | None = None, mode: FlowMode | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None,
+        thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: Literal[True] = True, temporal_func: VSFunction = ...
     ) -> vs.VideoNode:
         ...
@@ -549,7 +549,7 @@ class MVTools(vs_object):
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, direction: MVDirection = MVDirection.BOTH,
         tr: int | None = None, time: float | None = None, mode: FlowMode | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None,
+        thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: Literal[False] = False, temporal_func: None = None
     ) -> tuple[list[vs.VideoNode], list[vs.VideoNode]]:
         ...
@@ -558,7 +558,7 @@ class MVTools(vs_object):
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, direction: MVDirection = MVDirection.BOTH,
         tr: int | None = None, time: float | None = None, mode: FlowMode | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None,
+        thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: bool = True, temporal_func: VSFunction | None = None
     ) -> vs.VideoNode | tuple[list[vs.VideoNode], list[vs.VideoNode]] | tuple[vs.VideoNode, tuple[int, int]]:
         """
@@ -630,7 +630,7 @@ class MVTools(vs_object):
         thsad: int | tuple[int | None, int | None] | None = None,
         thsad2: int | tuple[int | None, int | None] | None = None,
         limit: int | tuple[int | None, int | None] | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None,
+        thscd: int | tuple[int | None, int | float | None] | None = None,
     ) -> vs.VideoNode:
         """
         Perform temporal denoising using motion compensation.
@@ -705,13 +705,13 @@ class MVTools(vs_object):
             )
 
         return output
-    
+
     @overload
     def flow_interpolate(
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, time: float | None = None,
         ml: float | None = None, blend: bool | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None,
+        thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: Literal[True] = ..., multi: int | None = None
     ) -> vs.VideoNode:
         ...
@@ -721,7 +721,7 @@ class MVTools(vs_object):
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, time: float | None = None,
         ml: float | None = None, blend: bool | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None,
+        thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: Literal[False] = ..., multi: int | None = None
     ) -> list[vs.VideoNode]:
         ...
@@ -731,7 +731,7 @@ class MVTools(vs_object):
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, time: float | None = None,
         ml: float | None = None, blend: bool | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None,
+        thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: bool = ..., multi: int | None = None
     ) -> vs.VideoNode | list[vs.VideoNode]:
         ...
@@ -740,7 +740,7 @@ class MVTools(vs_object):
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, time: float | None = None,
         ml: float | None = None, blend: bool | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None,
+        thscd: int | tuple[int | None, int | float | None] | None = None,
         interleave: bool = True, multi: int | None = None
     ) -> vs.VideoNode | list[vs.VideoNode]:
         """
@@ -815,7 +815,7 @@ class MVTools(vs_object):
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, fps: Fraction | None = None,
         mask: int | None = None, ml: float | None = None, blend: bool | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None
+        thscd: int | tuple[int | None, int | float | None] | None = None
     ) -> vs.VideoNode:
         """
         Changes the framerate of the clip by interpolating frames between existing frames.
@@ -864,7 +864,7 @@ class MVTools(vs_object):
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, fps: Fraction | None = None,
         mode: int | None = None, ml: float | None = None, blend: bool | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None
+        thscd: int | tuple[int | None, int | float | None] | None = None
     ) -> vs.VideoNode:
         """
         Changes the framerate of the clip by interpolating frames between existing frames
@@ -913,7 +913,7 @@ class MVTools(vs_object):
     def flow_blur(
         self, clip: vs.VideoNode | None = None, super: vs.VideoNode | None = None,
         vectors: MotionVectors | None = None, blur: float | None = None,
-        prec: int | None = None, thscd: int | tuple[int | None, int | None] | None = None
+        prec: int | None = None, thscd: int | tuple[int | None, int | float | None] | None = None
     ) -> vs.VideoNode:
         """
         Creates a motion blur effect by simulating finite shutter time, similar to film cameras.
@@ -952,7 +952,7 @@ class MVTools(vs_object):
         direction: Literal[MVDirection.FORWARD] | Literal[MVDirection.BACKWARD] = MVDirection.FORWARD,
         delta: int = 1, ml: float | None = None, gamma: float | None = None,
         kind: MaskMode | None = None, time: float | None = None, ysc: int | None = None,
-        thscd: int | tuple[int | None, int | None] | None = None
+        thscd: int | tuple[int | None, int | float | None] | None = None
     ) -> vs.VideoNode:
         """
         Creates a mask clip from motion vectors data.
@@ -995,7 +995,7 @@ class MVTools(vs_object):
 
     def sc_detection(
         self, clip: vs.VideoNode | None = None, vectors: MotionVectors | None = None,
-        delta: int = 1, thscd: int | tuple[int | None, int | None] | None = None
+        delta: int = 1, thscd: int | tuple[int | None, int | float | None] | None = None
     ) -> vs.VideoNode:
         """
         Creates scene detection mask clip from motion vectors data.

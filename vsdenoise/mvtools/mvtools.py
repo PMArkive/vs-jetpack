@@ -479,7 +479,7 @@ class MVTools(vs_object):
                                  Controls the interpolation position between frames.
         :param thscd:            Scene change detection thresholds.
                                  First value is the block change threshold between frames.
-                                 Second value is the number of changed blocks needed for a scene change.
+                                 Second value is the percentage of changed blocks needed for a scene change.
         :param interleave:       Whether to interleave the compensated frames with the input.
         :param temporal_func:    Temporal function to apply to the motion compensated frames.
 
@@ -766,7 +766,7 @@ class MVTools(vs_object):
                               If True, frames will be blended. If False, frames will be copied.
         :param thscd:         Scene change detection thresholds.
                               First value is the block change threshold between frames.
-                              Second value is the number of changed blocks needed for a scene change.
+                              Second value is the percentage of changed blocks needed for a scene change.
         :param interleave:    Whether to interleave the interpolated frames with the source clip.
         :param multi:         Framerate multiplier.
 
@@ -839,7 +839,7 @@ class MVTools(vs_object):
                            If True, frames will be blended. If False, frames will be copied.
         :param thscd:      Scene change detection thresholds.
                            First value is the block change threshold between frames.
-                           Second value is the number of changed blocks needed for a scene change.
+                           Second value is the percentage of changed blocks needed for a scene change.
 
         :return:           Clip with its framerate resampled.
         """
@@ -889,7 +889,7 @@ class MVTools(vs_object):
                            If True, frames will be blended. If False, frames will be copied.
         :param thscd:      Scene change detection thresholds.
                            First value is the block change threshold between frames.
-                           Second value is the number of changed blocks needed for a scene change.
+                           Second value is the percentage of changed blocks needed for a scene change.
 
         :return:           Clip with its framerate resampled.
         """
@@ -931,7 +931,7 @@ class MVTools(vs_object):
         :param prec:       Blur precision in pixel units. Controls the accuracy of the motion blur.
         :param thscd:      Scene change detection thresholds.
                            First value is the block change threshold between frames.
-                           Second value is the number of changed blocks needed for a scene change.
+                           Second value is the percentage of changed blocks needed for a scene change.
 
         :return:           Motion blurred clip.
         """
@@ -972,7 +972,7 @@ class MVTools(vs_object):
         :param ysc:          Value assigned to the mask on scene changes.
         :param thscd:        Scene change detection thresholds.
                              First value is the block change threshold between frames.
-                             Second value is the number of changed blocks needed for a scene change.
+                             Second value is the percentage of changed blocks needed for a scene change.
 
         :return:             Motion mask clip.
         """
@@ -1007,7 +1007,7 @@ class MVTools(vs_object):
         :param delta:      Motion vector delta to use.
         :param thscd:      Scene change detection thresholds.
                            First value is the block change threshold between frames.
-                           Second value is the number of changed blocks needed for a scene change.
+                           Second value is the percentage of changed blocks needed for a scene change.
 
         :return:           Clip with scene change properties set.
         """

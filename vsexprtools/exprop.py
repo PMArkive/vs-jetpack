@@ -4,6 +4,8 @@ from itertools import cycle
 from math import isqrt, pi
 from typing import Any, Iterable, Iterator, Sequence, SupportsFloat, SupportsIndex, overload
 
+from jetpytools import SupportsString
+
 from vstools import (
     ColorRange, ConstantFormatVideoNode, ConvMode, CustomEnum, CustomIndexError, CustomValueError, FuncExceptT,
     HoldsVideoFormatT, PlanesT, StrArrOpt, StrList, VideoFormatT, VideoNodeIterableT, VideoNodeT, flatten,
@@ -271,7 +273,7 @@ class ExprOp(ExprOpBase, CustomEnum):
         return [self] * n
 
     @classmethod
-    def atan(cls, c: str = "x", n: int = 5) -> ExprList:
+    def atan(cls, c: SupportsString = "", n: int = 5) -> ExprList:
         # Using domain reduction when |x| > 1
         expr = ExprList([
             ExprList([c, ExprOp.DUP, "atanvar!", ExprOp.ABS, 1, ExprOp.GT]),
@@ -286,7 +288,7 @@ class ExprOp(ExprOpBase, CustomEnum):
         return expr
 
     @classmethod
-    def atanf(cls, c: str = "x", n: int = 5) -> ExprList:
+    def atanf(cls, c: SupportsString = "", n: int = 5) -> ExprList:
         # Approximation using Taylor series
         n = max(2, n)
 
@@ -298,7 +300,7 @@ class ExprOp(ExprOpBase, CustomEnum):
         return expr
 
     @classmethod
-    def atan2(cls, y: str = "y", x: str = "x", n: int = 5) -> ExprList:
+    def atan2(cls, y: SupportsString = "", x: SupportsString = "", n: int = 5) -> ExprList:
         expr = ExprList([
             y, x, "atan2xvar!", "atan2yvar!",
             ExprList(["atan2xvar@", 0, ExprOp.EQ]),                                        # if x = 0
@@ -322,18 +324,21 @@ class ExprOp(ExprOpBase, CustomEnum):
         return expr
 
     @classmethod
-    def asin(cls, c: str = "x", n: int = 5) -> ExprList:
+    def asin(cls, c: SupportsString = "", n: int = 5) -> ExprList:
         return cls.atan(
             ExprList([c, ExprOp.DUP, ExprOp.DUP, ExprOp.MUL, 1, ExprOp.SWAP, ExprOp.SUB, ExprOp.SQRT, ExprOp.DIV]).to_str(), n
         )
 
     @classmethod
-    def acos(cls, c: str = "x", n: int = 5) -> ExprList:
+    def acos(cls, c: SupportsString = "", n: int = 5) -> ExprList:
         return ExprList([cls.PI, 2, ExprOp.DIV, cls.asin(c, n), ExprOp.SUB])
 
     @classmethod
     def clamp(
-        cls, min: float | ExprToken = ExprToken.RangeMin, max: float | ExprToken = ExprToken.RangeMax, c: str = ''
+        cls,
+        min: float | ExprToken = ExprToken.RangeMin,
+        max: float | ExprToken = ExprToken.RangeMax,
+        c: SupportsString = ''
     ) -> ExprList:
 
         if complexpr_available:

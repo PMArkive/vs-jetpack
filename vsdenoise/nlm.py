@@ -56,7 +56,10 @@ class DeviceType(CustomEnum):
         if hasattr(core, "nlm_ispc"):
             return DeviceType.CPU.NLMeans(clip, *args, **kwargs)
 
-        raise CustomRuntimeError()
+        raise CustomRuntimeError(
+            "No compatible plugin found. Please install one from: "
+            "https://github.com/AmusementClub/vs-nlm-cuda or https://github.com/AmusementClub/vs-nlm-ispc"
+        )
 
 
 class NLMWeightMode(CustomIntEnum):

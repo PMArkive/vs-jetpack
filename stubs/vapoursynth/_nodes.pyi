@@ -661,6 +661,44 @@ class _Plugin_mvsf_VideoNode_Bound(Plugin):
 
 
 
+
+_ReturnDict_nlm_cuda_Version = TypedDict(
+    "_ReturnDict_nlm_cuda_Version",
+    {
+        "cuda_version": int,
+        "version": bytes,
+    }
+)
+
+# implementation: nlm_cuda
+
+class _Plugin_nlm_cuda_Core_Bound(Plugin):
+    """This class implements the module definitions for the "nlm_cuda" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def NLMeans(self, clip: VideoNode, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None, device_id: int | None = None, num_streams: int | None = None) -> ConstantFormatVideoNode: ...
+    def Version(self) -> _ReturnDict_nlm_cuda_Version: ...
+
+class _Plugin_nlm_cuda_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "nlm_cuda" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def NLMeans(self, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None, device_id: int | None = None, num_streams: int | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
+
+# implementation: nlm_ispc
+
+class _Plugin_nlm_ispc_Core_Bound(Plugin):
+    """This class implements the module definitions for the "nlm_ispc" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def NLMeans(self, clip: VideoNode, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None) -> ConstantFormatVideoNode: ...
+    def Version(self) -> bytes: ...
+
+class _Plugin_nlm_ispc_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "nlm_ispc" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def NLMeans(self, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
+
+
 # implementation: placebo
 
 class _Plugin_placebo_Core_Bound(Plugin):
@@ -1557,6 +1595,16 @@ class VideoNode(RawNode):
     def mvsf(self) -> _Plugin_mvsf_VideoNode_Bound:
         """MVTools Single Precision"""
     # end instance
+    # instance_bound_VideoNode: nlm_cuda
+    @property
+    def nlm_cuda(self) -> _Plugin_nlm_cuda_VideoNode_Bound:
+        """Non-local means denoise filter implemented in CUDA"""
+    # end instance
+    # instance_bound_VideoNode: nlm_ispc
+    @property
+    def nlm_ispc(self) -> _Plugin_nlm_ispc_VideoNode_Bound:
+        """Non-local means denoise filter implemented in ISPC"""
+    # end instance
     # instance_bound_VideoNode: placebo
     @property
     def placebo(self) -> _Plugin_placebo_VideoNode_Bound:
@@ -1869,6 +1917,16 @@ class Core:
     @property
     def mvsf(self) -> _Plugin_mvsf_Core_Bound:
         """MVTools Single Precision"""
+    # end instance
+    # instance_bound_Core: nlm_cuda
+    @property
+    def nlm_cuda(self) -> _Plugin_nlm_cuda_Core_Bound:
+        """Non-local means denoise filter implemented in CUDA"""
+    # end instance
+    # instance_bound_Core: nlm_ispc
+    @property
+    def nlm_ispc(self) -> _Plugin_nlm_ispc_Core_Bound:
+        """Non-local means denoise filter implemented in ISPC"""
     # end instance
     # instance_bound_Core: placebo
     @property

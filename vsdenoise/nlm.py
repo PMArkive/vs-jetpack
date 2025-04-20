@@ -25,13 +25,25 @@ class DeviceType(CustomEnum):
     """Enum representing available device on which to run the plugin."""
 
     AUTO = 'auto'
-    """Automatically selects the available device. Priority: "cuda" > "cpu"."""
+    """
+    Automatically selects the available device.
+    Priority: "cuda" -> "accelerator" -> "gpu" -> "cpu" -> "ispc".
+    """
+
+    ACCELERATOR = 'accelerator'
+    """Dedicated OpenCL accelerators."""
+
+    GPU = 'gpu'
+    """An OpenCL device that is a GPU."""
 
     CPU = 'cpu'
-    """Uses the ISPC (CPU-based) implementation."""
+    """An OpenCL device that is the host processor."""
+
+    ISPC = 'ispc'
+    """ISPC (CPU-based) implementation."""
 
     CUDA = 'cuda'
-    """Uses the CUDA (GPU-based) implementation."""
+    """CUDA (GPU-based) implementation."""
 
     def NLMeans(self, clip: vs.VideoNode, *args: Any, **kwargs: Any) -> ConstantFormatVideoNode:
         """
@@ -44,21 +56,28 @@ class DeviceType(CustomEnum):
         :return:                        Denoised clip.
         """
 
-        if self.value == "cuda":
+        if self == DeviceType.CUDA:
             return clip.nlm_cuda.NLMeans(*args, **kwargs)
 
-        if self.value == "cpu":
+        if self in [DeviceType.ACCELERATOR, DeviceType.GPU, DeviceType.CPU]:
+            return clip.knlm.KNLMeansCL(*args, **kwargs | dict(device_type=self.value))
+
+        if self == DeviceType.ISPC:
             return clip.nlm_ispc.NLMeans(*args, **kwargs)
 
         if hasattr(core, "nlm_cuda"):
             return DeviceType.CUDA.NLMeans(clip, *args, **kwargs)
 
+        if hasattr(core, "knlm"):
+            return clip.knlm.KNLMeansCL(*args, **kwargs | dict(device_type="auto"))
+
         if hasattr(core, "nlm_ispc"):
-            return DeviceType.CPU.NLMeans(clip, *args, **kwargs)
+            return DeviceType.ISPC.NLMeans(clip, *args, **kwargs)
 
         raise CustomRuntimeError(
             "No compatible plugin found. Please install one from: "
-            "https://github.com/AmusementClub/vs-nlm-cuda or https://github.com/AmusementClub/vs-nlm-ispc"
+            "https://github.com/AmusementClub/vs-nlm-cuda, https://github.com/AmusementClub/vs-nlm-ispc "
+            "or https://github.com/Khanattila/KNLMeansCL"
         )
 
 

@@ -461,6 +461,20 @@ class _Plugin_imwri_VideoNode_Bound(Plugin):
 
 
 
+# implementation: knlm
+
+class _Plugin_knlm_Core_Bound(Plugin):
+    """This class implements the module definitions for the "knlm" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def KNLMeansCL(self, clip: VideoNode, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None, device_type: _DataType | None = None, device_id: int | None = None, ocl_x: int | None = None, ocl_y: int | None = None, ocl_r: int | None = None, info: int | None = None) -> ConstantFormatVideoNode: ...
+
+class _Plugin_knlm_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "knlm" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def KNLMeansCL(self, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None, device_type: _DataType | None = None, device_id: int | None = None, ocl_x: int | None = None, ocl_y: int | None = None, ocl_r: int | None = None, info: int | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
+
+
 # implementation: lsmas
 
 class _Plugin_lsmas_Core_Bound(Plugin):
@@ -1575,6 +1589,11 @@ class VideoNode(RawNode):
     def imwri(self) -> _Plugin_imwri_VideoNode_Bound:
         """VapourSynth ImageMagick 7 HDRI Writer/Reader"""
     # end instance
+    # instance_bound_VideoNode: knlm
+    @property
+    def knlm(self) -> _Plugin_knlm_VideoNode_Bound:
+        """KNLMeansCL for VapourSynth"""
+    # end instance
     # instance_bound_VideoNode: manipmv
     @property
     def manipmv(self) -> _Plugin_manipmv_VideoNode_Bound:
@@ -1892,6 +1911,11 @@ class Core:
     @property
     def imwri(self) -> _Plugin_imwri_Core_Bound:
         """VapourSynth ImageMagick 7 HDRI Writer/Reader"""
+    # end instance
+    # instance_bound_Core: knlm
+    @property
+    def knlm(self) -> _Plugin_knlm_Core_Bound:
+        """KNLMeansCL for VapourSynth"""
     # end instance
     # instance_bound_Core: lsmas
     @property

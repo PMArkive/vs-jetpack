@@ -149,12 +149,12 @@ class NLMeans(Generic[P, R]):
 @NLMeans
 def nl_means(
     clip: vs.VideoNode,
-    strength: float | Sequence[float] = 1.2,
-    tr: int | Sequence[int] = 1,
-    sr: int | Sequence[int] = 2,
-    simr: int | Sequence[int] = 4,
+    h: float | Sequence[float] = 1.2,
+    d: int | Sequence[int] = 1,
+    a: int | Sequence[int] = 2,
+    s: int | Sequence[int] = 4,
     device_type: NLMeans.DeviceType = NLMeans.DeviceType.AUTO,
-    ref: vs.VideoNode | None = None,
+    rclip: vs.VideoNode | None = None,
     wmode: NLMeans.WeightMode | NLMeans.WeightModeAndRef = NLMeans.WeightMode.WELSCH,
     planes: PlanesT = None,
     **kwargs: Any
@@ -170,31 +170,21 @@ def nl_means(
         ```
 
     :param clip:            Source clip.
-
-    :param strength:        Controls the strength of the filtering.
+    :param h:               Controls the strength of the filtering.
                             Larger values will remove more noise.
-                            This is the ``h`` parameter.
-
-    :param tr:              Temporal Radius. Temporal size = `(2 * tr + 1)`.
+    :param d:               Temporal Radius. Temporal size = `(2 * d + 1)`.
                             Sets the number of past and future frames to uses for denoising the current frame.
-                            tr=0 uses 1 frame, while tr=1 uses 3 frames and so on.
+                            d=0 uses 1 frame, while d=1 uses 3 frames and so on.
                             Usually, larger values result in better denoising.
-                            This is the ``d`` parameter.
-
-    :param sr:              Search Radius. Spatial size = `(2 * sr + 1)^2`.
+    :param a:               Search Radius. Spatial size = `(2 * a + 1)^2`.
                             Sets the radius of the search window.
-                            sr=1 uses 9 pixel, while sr=2 uses 25 pixels and so on.
+                            a=1 uses 9 pixel, while a=2 uses 25 pixels and so on.
                             Usually, larger values result in better denoising.
-                            This is the ``a`` parameter.
-
-    :param simr:            Similarity Radius. Similarity neighbourhood size = `(2 * simr + 1) ** 2`.
+    :param s:               Similarity Radius. Similarity neighbourhood size = `(2 * s + 1) ** 2`.
                             Sets the radius of the similarity neighbourhood window.
                             The impact on performance is low, therefore it depends on the nature of the noise.
-                            This is the ``s`` parameter.
-
     :param device_type:     Set the device to use for processing.
     :param ref:             Reference clip to do weighting calculation.
-                            This is the ``rclip`` parameter.
     :param wmode:           Weighting function to use.
     :param planes:          Which planes to process.
     :param kwargs:          Additional arguments passed to the plugin.
@@ -209,18 +199,26 @@ def nl_means(
     if not planes:
         return clip
 
-    nstrength, ntr, nsr, nsimr = to_arr(strength), to_arr(tr), to_arr(sr), to_arr(simr)
-
+    params = dict[str, list[float] | list[int]](h=to_arr(h), d=to_arr(d), a=to_arr(a), s=to_arr(s))
     wmoder, wref = wmode if isinstance(wmode, NLMeans.WeightModeAndRef) else wmode()
 
-    params = dict[str, list[float] | list[int]](strength=nstrength, tr=ntr, sr=nsr, simr=nsimr)
+    # TODO: Remove legacy support for old arguments.
+    for sargs, kargs in zip(
+        ["strength", "tr", "sr", "simr"],
+        params.keys()
+    ):
+        if sargs in kwargs:
+            warnings.warn(
+                f"nl_means: '{sargs}' argument is deprecated, use '{kargs}' instead",
+                UserWarning
+            )
+            params[kargs] = to_arr(kwargs.pop(sargs))
 
     def _nl_means(i: int, channels: str) -> vs.VideoNode:
         return device_type.NLMeans(
-            clip, **dict(
-                h=nstrength[i], d=ntr[i], a=nsr[i], s=nsimr[i],
-                channels=channels, rclip=ref, wmode=wmoder.value, wref=wref
-            ) | kwargs
+            clip,
+            **{k: p[i] for k, p in params.items()},
+            **dict(channels=channels, rclip=rclip, wmode=wmoder.value, wref=wref) | kwargs
         )
 
     if clip.format.color_family in {vs.GRAY, vs.RGB}:
@@ -240,7 +238,8 @@ def nl_means(
     ):
         return _nl_means(0, 'YUV')
 
-    nstrength, (ntr, nsr, nsimr) = normalize_seq(nstrength, 2), (normalize_seq(x, 2) for x in (ntr, nsr, nsimr))
+    for k, p in params.items():
+        params[k] = normalize_seq(p, 2)
 
     luma = _nl_means(0, 'Y') if 0 in planes else None
     chroma = _nl_means(1, 'UV') if 1 in planes or 2 in planes else None

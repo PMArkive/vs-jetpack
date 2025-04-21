@@ -5,149 +5,169 @@ This module implements a wrapper for non local means denoisers
 from __future__ import annotations
 
 import warnings
-from typing import Any, NamedTuple, Sequence
 
-from jetpytools import CustomRuntimeError
+from typing import Any, Callable, Generic, NamedTuple, Sequence
+
+from jetpytools import CustomRuntimeError, CustomStrEnum, P, R
 
 from vstools import (
-    ConstantFormatVideoNode, CustomEnum, CustomIntEnum, PlanesT,
-    check_variable, core, join, normalize_planes, normalize_seq, to_arr, vs
+    ConstantFormatVideoNode, CustomIntEnum, PlanesT, check_variable, core, join, normalize_planes, normalize_seq,
+    to_arr, vs
 )
 
 __all__ = [
-    'DeviceType', 'NLMWeightMode',
-
     'nl_means'
 ]
 
-
-class DeviceType(CustomEnum):
-    """Enum representing available device on which to run the plugin."""
-
-    AUTO = 'auto'
+class NLMeans(Generic[P, R]):
     """
-    Automatically selects the available device.
-    Priority: "cuda" -> "accelerator" -> "gpu" -> "cpu" -> "ispc".
+    Class decorator that wraps the [nl_means][vsdenoise.nlm.nl_means] function
+    and adds enumerations relevant to its implementation.
+
+    It is not meant to be used directly.
     """
 
-    ACCELERATOR = 'accelerator'
-    """Dedicated OpenCL accelerators."""
+    def __init__(self, nl_means_func: Callable[P, R]) -> None:
+        self._func = nl_means_func
 
-    GPU = 'gpu'
-    """An OpenCL device that is a GPU."""
-
-    CPU = 'cpu'
-    """An OpenCL device that is the host processor."""
-
-    ISPC = 'ispc'
-    """ISPC (CPU-based) implementation."""
-
-    CUDA = 'cuda'
-    """CUDA (GPU-based) implementation."""
-
-    def NLMeans(self, clip: vs.VideoNode, *args: Any, **kwargs: Any) -> ConstantFormatVideoNode:
-        """
-        Applies the Non-Local Means denoising filter using the plugin associated with the selected device type.
-
-        :param clip:                    Source clip.
-        :param *args:                   Positional arguments to be passed to the selected plugin.
-        :param **kwargs:                Keywords arguments to be passed to the selected plugin.        
-        :raises CustomRuntimeError:     If the selected device is not available or unsupported.
-        :return:                        Denoised clip.
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        """        
+        See [nl_means][vsdenoise.nlm.nl_means] here.
         """
 
-        if self == DeviceType.CUDA:
-            return clip.nlm_cuda.NLMeans(*args, **kwargs)
+        return self._func(*args, **kwargs)
 
-        if self in [DeviceType.ACCELERATOR, DeviceType.GPU, DeviceType.CPU]:
-            return clip.knlm.KNLMeansCL(*args, **kwargs | dict(device_type=self.value))
+    class DeviceType(CustomStrEnum):
+        """Enum representing available device on which to run the plugin."""
 
-        if self == DeviceType.ISPC:
-            return clip.nlm_ispc.NLMeans(*args, **kwargs)
-
-        if hasattr(core, "nlm_cuda"):
-            return DeviceType.CUDA.NLMeans(clip, *args, **kwargs)
-
-        if hasattr(core, "knlm"):
-            return clip.knlm.KNLMeansCL(*args, **kwargs | dict(device_type="auto"))
-
-        if hasattr(core, "nlm_ispc"):
-            return DeviceType.ISPC.NLMeans(clip, *args, **kwargs)
-
-        raise CustomRuntimeError(
-            "No compatible plugin found. Please install one from: "
-            "https://github.com/AmusementClub/vs-nlm-cuda, https://github.com/AmusementClub/vs-nlm-ispc "
-            "or https://github.com/Khanattila/KNLMeansCL"
-        )
-
-
-class NLMWeightMode(CustomIntEnum):
-    """Enum of weighting modes for Non-Local Means (NLM) denoiser."""
-
-    WELSCH = 0
-    """
-    Welsch weighting function has a faster decay, but still assigns positive weights to dissimilar blocks.
-    Original Non-local means denoising weighting function.
-    """
-
-    BISQUARE_LR = 1
-    """
-    Modified Bisquare weighting function to be less robust.
-    """
-
-    BISQUARE_THR = 2
-    """
-    Bisquare weighting function use a soft threshold to compare neighbourhoods.
-    The weight is 0 as soon as a given threshold is exceeded.
-    """
-
-    BISQUARE_HR = 3
-    """
-    Modified Bisquare weighting function to be even more robust.
-    """
-
-    def __call__(self, weight_ref: float | None = None) -> NLMWeightModeAndRef:
+        AUTO = 'auto'
         """
-        :param weight_ref:  Amount of original pixel to contribute to the filter output,
-                            relative to the weight of the most similar pixel found.
-
-        :return:            Config with weight mode and ref.
+        Automatically selects the available device.
+        Priority: "cuda" -> "accelerator" -> "gpu" -> "cpu" -> "ispc".
         """
-        return NLMWeightModeAndRef(self, weight_ref)
+
+        ACCELERATOR = 'accelerator'
+        """Dedicated OpenCL accelerators."""
+
+        GPU = 'gpu'
+        """An OpenCL device that is a GPU."""
+
+        CPU = 'cpu'
+        """An OpenCL device that is the host processor."""
+
+        ISPC = 'ispc'
+        """ISPC (CPU-based) implementation."""
+
+        CUDA = 'cuda'
+        """CUDA (GPU-based) implementation."""
+
+        def NLMeans(self, clip: vs.VideoNode, *args: Any, **kwargs: Any) -> ConstantFormatVideoNode:
+            """
+            Applies the Non-Local Means denoising filter using the plugin associated with the selected device type.
+
+            :param clip:                    Source clip.
+            :param *args:                   Positional arguments to be passed to the selected plugin.
+            :param **kwargs:                Keywords arguments to be passed to the selected plugin.        
+            :raises CustomRuntimeError:     If the selected device is not available or unsupported.
+            :return:                        Denoised clip.
+            """
+
+            if self == NLMeans.DeviceType.CUDA:
+                return clip.nlm_cuda.NLMeans(*args, **kwargs)
+
+            if self in [NLMeans.DeviceType.ACCELERATOR, NLMeans.DeviceType.GPU, NLMeans.DeviceType.CPU]:
+                return clip.knlm.KNLMeansCL(*args, **kwargs | dict(device_type=self.value))
+
+            if self == NLMeans.DeviceType.ISPC:
+                return clip.nlm_ispc.NLMeans(*args, **kwargs)
+
+            if hasattr(core, "nlm_cuda"):
+                return NLMeans.DeviceType.CUDA.NLMeans(clip, *args, **kwargs)
+
+            if hasattr(core, "knlm"):
+                return clip.knlm.KNLMeansCL(*args, **kwargs | dict(device_type="auto"))
+
+            if hasattr(core, "nlm_ispc"):
+                return NLMeans.DeviceType.ISPC.NLMeans(clip, *args, **kwargs)
+
+            raise CustomRuntimeError(
+                "No compatible plugin found. Please install one from: "
+                "https://github.com/AmusementClub/vs-nlm-cuda, https://github.com/AmusementClub/vs-nlm-ispc "
+                "or https://github.com/Khanattila/KNLMeansCL"
+            )
+
+    class WeightMode(CustomIntEnum):
+        """Enum of weighting modes for Non-Local Means (NLM) denoiser."""
+
+        WELSCH = 0
+        """
+        Welsch weighting function has a faster decay, but still assigns positive weights to dissimilar blocks.
+        Original Non-local means denoising weighting function.
+        """
+
+        BISQUARE_LR = 1
+        """
+        Modified Bisquare weighting function to be less robust.
+        """
+
+        BISQUARE_THR = 2
+        """
+        Bisquare weighting function use a soft threshold to compare neighbourhoods.
+        The weight is 0 as soon as a given threshold is exceeded.
+        """
+
+        BISQUARE_HR = 3
+        """
+        Modified Bisquare weighting function to be even more robust.
+        """
+
+        def __call__(self, weight_ref: float | None = None) -> NLMeans.WeightModeAndRef:
+            """
+            :param weight_ref:  Amount of original pixel to contribute to the filter output,
+                                relative to the weight of the most similar pixel found.
+
+            :return:            Config with weight mode and ref.
+            """
+            return NLMeans.WeightModeAndRef(self, weight_ref)
+
+    class WeightModeAndRef(NamedTuple):
+        """
+        Extended configuration for Non-Local Means (NLM) weighting,
+        adding the weight reference.
+        """
+
+        weight_mode: NLMeans.WeightMode
+        """See ``NLMWeightMode``"""
+
+        weight_ref: float | None
+        """
+        Amount of original pixel to contribute to the filter output,
+        relative to the weight of the most similar pixel found.
+        """
 
 
-class NLMWeightModeAndRef(NamedTuple):
-    """
-    Extended configuration for Non-Local Means (NLM) weighting,
-    adding the weight reference.
-    """
-
-    weight_mode: NLMWeightMode
-    """See ``NLMWeightMode``"""
-
-    weight_ref: float | None
-    """
-    Amount of original pixel to contribute to the filter output,
-    relative to the weight of the most similar pixel found.
-    """
-
-
+@NLMeans
 def nl_means(
     clip: vs.VideoNode,
     strength: float | Sequence[float] = 1.2,
     tr: int | Sequence[int] = 1,
     sr: int | Sequence[int] = 2,
     simr: int | Sequence[int] = 4,
-    device_type: DeviceType = DeviceType.AUTO,
+    device_type: NLMeans.DeviceType = NLMeans.DeviceType.AUTO,
     ref: vs.VideoNode | None = None,
-    wmode: NLMWeightMode | NLMWeightModeAndRef = NLMWeightMode.WELSCH,
+    wmode: NLMeans.WeightMode | NLMeans.WeightModeAndRef = NLMeans.WeightMode.WELSCH,
     planes: PlanesT = None,
     **kwargs: Any
 ) -> vs.VideoNode:
     """
     Convenience wrapper for NLMeans implementations.
 
-    Filter description at ``https://github.com/Khanattila/KNLMeansCL/wiki/Filter-description`` 
+    Filter description [here](https://github.com/Khanattila/KNLMeansCL/wiki/Filter-description).
+
+    Example:
+        ```py
+        denoised = nl_means(clip, 0.4, device_type=nl_means.DeviceType.CUDA, ...)
+        ```
 
     :param clip:            Source clip.
 
@@ -191,7 +211,7 @@ def nl_means(
 
     nstrength, ntr, nsr, nsimr = to_arr(strength), to_arr(tr), to_arr(sr), to_arr(simr)
 
-    wmoder, wref = wmode if isinstance(wmode, NLMWeightModeAndRef) else wmode()
+    wmoder, wref = wmode if isinstance(wmode, NLMeans.WeightModeAndRef) else wmode()
 
     params = dict[str, list[float] | list[int]](strength=nstrength, tr=ntr, sr=nsr, simr=nsimr)
 

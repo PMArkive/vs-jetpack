@@ -31,10 +31,6 @@ class NLMeans(Generic[P, R]):
         self._func = nl_means_func
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
-        """        
-        See [nl_means][vsdenoise.nlm.nl_means] here.
-        """
-
         return self._func(*args, **kwargs)
 
     class DeviceType(CustomStrEnum):

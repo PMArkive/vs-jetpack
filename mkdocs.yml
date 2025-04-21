@@ -62,7 +62,6 @@ plugins:
               - "!^_"
               - "^__call__$"
               - "^_dpir$"         # vs-denoise: mostly public via alias.
-              - "^_replace_ranges$"   # vs-tools: mostly public via alias.
             heading_level: 1
             inherited_members: true
             line_length: 80

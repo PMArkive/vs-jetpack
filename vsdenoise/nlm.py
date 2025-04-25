@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import warnings
 
-from typing import Any, Callable, Generic, NamedTuple, Sequence
+from typing import Any, Callable, Generic, Sequence
 
 from jetpytools import CustomRuntimeError, CustomStrEnum, P, R
 
@@ -95,6 +95,12 @@ class NLMeans(Generic[P, R]):
     class WeightMode(CustomIntEnum):
         """Enum of weighting modes for Non-Local Means (NLM) denoiser."""
 
+        wref: float | None
+
+        def __init__(self, value: int, wref: float | None = None) -> None:
+            self._value_ = value
+            self.wref = wref
+
         WELSCH = 0
         """
         Welsch weighting function has a faster decay, but still assigns positive weights to dissimilar blocks.
@@ -117,29 +123,17 @@ class NLMeans(Generic[P, R]):
         Modified Bisquare weighting function to be even more robust.
         """
 
-        def __call__(self, weight_ref: float | None = None) -> NLMeans.WeightModeAndRef:
+        def __call__(self, wref: float | None = None) -> NLMeans.WeightMode:
             """
-            :param weight_ref:  Amount of original pixel to contribute to the filter output,
-                                relative to the weight of the most similar pixel found.
+            :param wref:    Amount of original pixel to contribute to the filter output,
+                            relative to the weight of the most similar pixel found.
 
-            :return:            Config with weight mode and ref.
+            :return:        Config with weight mode and ref.
             """
-            return NLMeans.WeightModeAndRef(self, weight_ref)
-
-    class WeightModeAndRef(NamedTuple):
-        """
-        Extended configuration for Non-Local Means (NLM) weighting,
-        adding the weight reference.
-        """
-
-        weight_mode: NLMeans.WeightMode
-        """See ``NLMWeightMode``"""
-
-        weight_ref: float | None
-        """
-        Amount of original pixel to contribute to the filter output,
-        relative to the weight of the most similar pixel found.
-        """
+            new_enum = CustomIntEnum(self.__class__.__name__, NLMeans.WeightMode.__members__)  # type: ignore
+            member = getattr(new_enum, self.name)
+            member.wref = wref
+            return member
 
 
 @NLMeans
@@ -151,7 +145,7 @@ def nl_means(
     s: int | Sequence[int] = 4,
     device_type: NLMeans.DeviceType = NLMeans.DeviceType.AUTO,
     rclip: vs.VideoNode | None = None,
-    wmode: NLMeans.WeightMode | NLMeans.WeightModeAndRef = NLMeans.WeightMode.WELSCH,
+    wmode: NLMeans.WeightMode = NLMeans.WeightMode.WELSCH,
     planes: PlanesT = None,
     **kwargs: Any
 ) -> vs.VideoNode:
@@ -196,7 +190,6 @@ def nl_means(
         return clip
 
     params = dict[str, list[float] | list[int]](h=to_arr(h), d=to_arr(d), a=to_arr(a), s=to_arr(s))
-    wmoder, wref = wmode if isinstance(wmode, NLMeans.WeightModeAndRef) else wmode()
 
     # TODO: Remove legacy support for old arguments.
     for sargs, kargs in zip(
@@ -214,7 +207,7 @@ def nl_means(
         return device_type.NLMeans(
             clip,
             **{k: p[i] for k, p in params.items()},
-            **dict(channels=channels, rclip=rclip, wmode=wmoder.value, wref=wref) | kwargs
+            **dict(channels=channels, rclip=rclip, wmode=wmode, wref=wmode.wref) | kwargs
         )
 
     if clip.format.color_family in {vs.GRAY, vs.RGB}:

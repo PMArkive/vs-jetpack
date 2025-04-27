@@ -461,6 +461,20 @@ class _Plugin_imwri_VideoNode_Bound(Plugin):
 
 
 
+# implementation: knlm
+
+class _Plugin_knlm_Core_Bound(Plugin):
+    """This class implements the module definitions for the "knlm" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def KNLMeansCL(self, clip: VideoNode, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None, device_type: _DataType | None = None, device_id: int | None = None, ocl_x: int | None = None, ocl_y: int | None = None, ocl_r: int | None = None, info: int | None = None) -> ConstantFormatVideoNode: ...
+
+class _Plugin_knlm_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "knlm" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def KNLMeansCL(self, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None, device_type: _DataType | None = None, device_id: int | None = None, ocl_x: int | None = None, ocl_y: int | None = None, ocl_r: int | None = None, info: int | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
+
+
 # implementation: lsmas
 
 class _Plugin_lsmas_Core_Bound(Plugin):
@@ -656,6 +670,44 @@ class _Plugin_mvsf_VideoNode_Bound(Plugin):
     def Recalculate(self, *args: _VapourSynthMapValue, **kwargs: _VapourSynthMapValue) -> ConstantFormatVideoNode: ...
     def SCDetection(self, vectors: VideoNode, thscd1: float | None = None, thscd2: float | None = None) -> ConstantFormatVideoNode: ...
     def Super(self, hpad: int | None = None, vpad: int | None = None, pel: int | None = None, levels: int | None = None, chroma: int | None = None, sharp: int | None = None, rfilter: int | None = None, pelclip: VideoNode | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
+
+
+
+_ReturnDict_nlm_cuda_Version = TypedDict(
+    "_ReturnDict_nlm_cuda_Version",
+    {
+        "cuda_version": int,
+        "version": bytes,
+    }
+)
+
+# implementation: nlm_cuda
+
+class _Plugin_nlm_cuda_Core_Bound(Plugin):
+    """This class implements the module definitions for the "nlm_cuda" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def NLMeans(self, clip: VideoNode, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None, device_id: int | None = None, num_streams: int | None = None) -> ConstantFormatVideoNode: ...
+    def Version(self) -> _ReturnDict_nlm_cuda_Version: ...
+
+class _Plugin_nlm_cuda_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "nlm_cuda" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def NLMeans(self, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None, device_id: int | None = None, num_streams: int | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
+
+
+# implementation: nlm_ispc
+
+class _Plugin_nlm_ispc_Core_Bound(Plugin):
+    """This class implements the module definitions for the "nlm_ispc" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def NLMeans(self, clip: VideoNode, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None) -> ConstantFormatVideoNode: ...
+    def Version(self) -> bytes: ...
+
+class _Plugin_nlm_ispc_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "nlm_ispc" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def NLMeans(self, d: int | None = None, a: int | None = None, s: int | None = None, h: float | None = None, channels: _DataType | None = None, wmode: int | None = None, wref: float | None = None, rclip: VideoNode | None = None) -> ConstantFormatVideoNode: ...
 
 # end implementation
 
@@ -1537,6 +1589,11 @@ class VideoNode(RawNode):
     def imwri(self) -> _Plugin_imwri_VideoNode_Bound:
         """VapourSynth ImageMagick 7 HDRI Writer/Reader"""
     # end instance
+    # instance_bound_VideoNode: knlm
+    @property
+    def knlm(self) -> _Plugin_knlm_VideoNode_Bound:
+        """KNLMeansCL for VapourSynth"""
+    # end instance
     # instance_bound_VideoNode: manipmv
     @property
     def manipmv(self) -> _Plugin_manipmv_VideoNode_Bound:
@@ -1556,6 +1613,16 @@ class VideoNode(RawNode):
     @property
     def mvsf(self) -> _Plugin_mvsf_VideoNode_Bound:
         """MVTools Single Precision"""
+    # end instance
+    # instance_bound_VideoNode: nlm_cuda
+    @property
+    def nlm_cuda(self) -> _Plugin_nlm_cuda_VideoNode_Bound:
+        """Non-local means denoise filter implemented in CUDA"""
+    # end instance
+    # instance_bound_VideoNode: nlm_ispc
+    @property
+    def nlm_ispc(self) -> _Plugin_nlm_ispc_VideoNode_Bound:
+        """Non-local means denoise filter implemented in ISPC"""
     # end instance
     # instance_bound_VideoNode: placebo
     @property
@@ -1845,6 +1912,11 @@ class Core:
     def imwri(self) -> _Plugin_imwri_Core_Bound:
         """VapourSynth ImageMagick 7 HDRI Writer/Reader"""
     # end instance
+    # instance_bound_Core: knlm
+    @property
+    def knlm(self) -> _Plugin_knlm_Core_Bound:
+        """KNLMeansCL for VapourSynth"""
+    # end instance
     # instance_bound_Core: lsmas
     @property
     def lsmas(self) -> _Plugin_lsmas_Core_Bound:
@@ -1869,6 +1941,16 @@ class Core:
     @property
     def mvsf(self) -> _Plugin_mvsf_Core_Bound:
         """MVTools Single Precision"""
+    # end instance
+    # instance_bound_Core: nlm_cuda
+    @property
+    def nlm_cuda(self) -> _Plugin_nlm_cuda_Core_Bound:
+        """Non-local means denoise filter implemented in CUDA"""
+    # end instance
+    # instance_bound_Core: nlm_ispc
+    @property
+    def nlm_ispc(self) -> _Plugin_nlm_ispc_Core_Bound:
+        """Non-local means denoise filter implemented in ISPC"""
     # end instance
     # instance_bound_Core: placebo
     @property

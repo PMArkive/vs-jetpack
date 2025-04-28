@@ -1363,6 +1363,22 @@ class _Plugin_warpsf_VideoNode_Bound(Plugin):
 # end implementation
 
 
+# implementation: wnnm
+
+class _Plugin_wnnm_Core_Bound(Plugin):
+    """This class implements the module definitions for the "wnnm" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def VAggregate(self, clip: VideoNode, src: VideoNode, planes: _SingleAndSequence[int], internal: int | None = None) -> ConstantFormatVideoNode: ...
+    def Version(self) -> dict[str, bytes]: ...
+    def WNNM(self, clip: VideoNode, sigma: _SingleAndSequence[float] | None = None, block_size: int | None = None, block_step: int | None = None, group_size: int | None = None, bm_range: int | None = None, radius: int | None = None, ps_num: int | None = None, ps_range: int | None = None, residual: int | None = None, adaptive_aggregation: int | None = None, rclip: VideoNode | None = None) -> ConstantFormatVideoNode: ...
+    def WNNMRaw(self, clip: VideoNode, sigma: _SingleAndSequence[float] | None = None, block_size: int | None = None, block_step: int | None = None, group_size: int | None = None, bm_range: int | None = None, radius: int | None = None, ps_num: int | None = None, ps_range: int | None = None, residual: int | None = None, adaptive_aggregation: int | None = None, rclip: VideoNode | None = None) -> ConstantFormatVideoNode: ...
+
+class _Plugin_wnnm_VideoNode_Bound(Plugin):
+    """This class implements the module definitions for the "wnnm" VapourSynth plugin.\n\n*This class cannot be imported.*"""
+    def VAggregate(self, src: VideoNode, planes: _SingleAndSequence[int], internal: int | None = None) -> ConstantFormatVideoNode: ...
+    def WNNM(self, sigma: _SingleAndSequence[float] | None = None, block_size: int | None = None, block_step: int | None = None, group_size: int | None = None, bm_range: int | None = None, radius: int | None = None, ps_num: int | None = None, ps_range: int | None = None, residual: int | None = None, adaptive_aggregation: int | None = None, rclip: VideoNode | None = None) -> ConstantFormatVideoNode: ...
+    def WNNMRaw(self, sigma: _SingleAndSequence[float] | None = None, block_size: int | None = None, block_step: int | None = None, group_size: int | None = None, bm_range: int | None = None, radius: int | None = None, ps_num: int | None = None, ps_range: int | None = None, residual: int | None = None, adaptive_aggregation: int | None = None, rclip: VideoNode | None = None) -> ConstantFormatVideoNode: ...
+
+# end implementation
 
 
 # implementation: wwxd
@@ -1723,6 +1739,11 @@ class VideoNode(RawNode):
     def warpsf(self) -> _Plugin_warpsf_VideoNode_Bound:
         """Warpsharp floating point version"""
     # end instance
+    # instance_bound_VideoNode: wnnm
+    @property
+    def wnnm(self) -> _Plugin_wnnm_VideoNode_Bound:
+        """Weighted Nuclear Norm Minimization Denoiser"""
+    # end instance
     # instance_bound_VideoNode: wwxd
     @property
     def wwxd(self) -> _Plugin_wwxd_VideoNode_Bound:
@@ -2057,6 +2078,12 @@ class Core:
     def warpsf(self) -> _Plugin_warpsf_Core_Bound:
         """Warpsharp floating point version"""
     # end instance
+    # instance_bound_Core: wnnm
+    @property
+    def wnnm(self) -> _Plugin_wnnm_Core_Bound:
+        """Weighted Nuclear Norm Minimization Denoiser"""
+    # end instance
+    # instance_bound_Core: wwxd
     @property
     def wwxd(self) -> _Plugin_wwxd_Core_Bound:
         """Scene change detection approximately like Xvid's"""

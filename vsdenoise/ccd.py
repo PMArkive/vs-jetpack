@@ -7,13 +7,15 @@ from __future__ import annotations
 from math import sin, sqrt
 from typing import Any
 
+from typing_extensions import deprecated
+
 from vsaa import Nnedi3
 from vsexprtools import complexpr_available, norm_expr
 from vskernels import Bicubic, Point
 from vsscale import SSIM
 from vstools import (
-    EXPR_VARS, CustomIndexError, CustomIntEnum, InvalidColorFamilyError, Matrix, MatrixT, PlanesT,
-    UnsupportedSubsamplingError, check_ref_clip, fallback, get_peak_value, join, normalize_planes, plane, shift_clip,
+    EXPR_VARS, ConstantFormatVideoNode, CustomIndexError, CustomIntEnum, InvalidColorFamilyError, Matrix, MatrixT, PlanesT,
+    UnsupportedSubsamplingError, check_ref_clip, check_variable, fallback, get_peak_value, join, normalize_planes, plane, shift_clip,
     split, vs
 )
 
@@ -89,6 +91,7 @@ class CCDPoints(CustomIntEnum):
     """All points combined."""
 
 
+@deprecated("`ccd` will be deprecated when zsmooth CCD will be implemented.", category=PendingDeprecationWarning)
 def ccd(
     src: vs.VideoNode, thr: float = 4, tr: int = 0, ref: vs.VideoNode | None = None,
     mode: int | CCDMode | None = None, scale: float | None = None, matrix: MatrixT | None = None,
@@ -123,9 +126,10 @@ def ccd(
     :return:            Denoised clip.
     """
 
-    assert src.format
+    assert check_variable(src, ccd)
 
-    check_ref_clip(src, ref)
+    if ref is not None:
+        ref = check_ref_clip(src, ref)
 
     InvalidColorFamilyError.check(src, (vs.YUV, vs.RGB), ccd)
 
@@ -214,7 +218,7 @@ def ccd(
 
         def _get_weight_expr(x: int, y: int, c: str, weight: float | None = None) -> str:
             scale_str = peak != 1 and f'{peak} / ' or ''
-            weigth_str = weight is not None and f'{weight_b} *' or ''
+            weigth_str = weight is not None and f'{weight_b} *' or ''  # type: ignore
 
             return f'{c}[{x},{y}] {c} - {scale_str} 2 pow {weigth_str}'
 
@@ -272,7 +276,7 @@ def ccd(
     if not is_subsampled:
         yuv, yuvref = src, ref
     elif mode in {CCDMode.NNEDI_BICUBIC, CCDMode.NNEDI_SSIM}:
-        ref_clips = list[list[vs.VideoNode] | None]([split(src), ref and split(ref) or None])
+        ref_clips = list[list[ConstantFormatVideoNode] | None]([split(src), ref and split(ref) or None])
 
         src_left += 0.125 * divw
 
@@ -282,8 +286,8 @@ def ccd(
             ]) if planes else None for planes in ref_clips
         ]
     else:
-        yuv = Bicubic.scale(src, yuvw, yuvh, format=src444_format)
-        yuvref = ref and Bicubic.scale(ref, yuvw, yuvh, format=src444_format)
+        yuv = Bicubic.scale(src, yuvw, yuvh, format=src444_format)  # type: ignore[assignment]
+        yuvref = ref and Bicubic.scale(ref, yuvw, yuvh, format=src444_format)  # type: ignore[assignment]
 
     assert yuv and yuv.format
 

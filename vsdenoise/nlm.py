@@ -33,12 +33,14 @@ class NLMeans(Generic[P, R]):
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         return self._func(*args, **kwargs)
 
-    class DeviceType(CustomStrEnum):
-        """Enum representing available device on which to run the plugin."""
+    class Backend(CustomStrEnum):
+        """
+        Enum representing available backends on which to run the plugin.
+        """
 
         AUTO = 'auto'
         """
-        Automatically selects the available device.
+        Automatically selects the best available backend.
         Priority: "cuda" -> "accelerator" -> "gpu" -> "cpu" -> "ispc".
         """
 
@@ -59,32 +61,33 @@ class NLMeans(Generic[P, R]):
 
         def NLMeans(self, clip: vs.VideoNode, *args: Any, **kwargs: Any) -> ConstantFormatVideoNode:
             """
-            Applies the Non-Local Means denoising filter using the plugin associated with the selected device type.
+            Applies the Non-Local Means denoising filter using the plugin associated with the selected backend.
 
             :param clip:                    Source clip.
-            :param *args:                   Positional arguments to be passed to the selected plugin.
-            :param **kwargs:                Keywords arguments to be passed to the selected plugin.        
-            :raises CustomRuntimeError:     If the selected device is not available or unsupported.
+            :param *args:                   Positional arguments passed to the selected plugin.
+            :param **kwargs:                Keyword arguments passed to the selected plugin.
+            :raises CustomRuntimeError:     If the selected backend is not available or unsupported.
             :return:                        Denoised clip.
             """
 
-            if self == NLMeans.DeviceType.CUDA:
+            if self == NLMeans.Backend.CUDA:
                 return clip.nlm_cuda.NLMeans(*args, **kwargs)
 
-            if self in [NLMeans.DeviceType.ACCELERATOR, NLMeans.DeviceType.GPU, NLMeans.DeviceType.CPU]:
+            if self in [NLMeans.Backend.ACCELERATOR, NLMeans.Backend.GPU, NLMeans.Backend.CPU]:
                 return clip.knlm.KNLMeansCL(*args, **kwargs | dict(device_type=self.value))
 
-            if self == NLMeans.DeviceType.ISPC:
+            if self == NLMeans.Backend.ISPC:
                 return clip.nlm_ispc.NLMeans(*args, **kwargs)
 
+            # Fallback selection based on available plugins
             if hasattr(core, "nlm_cuda"):
-                return NLMeans.DeviceType.CUDA.NLMeans(clip, *args, **kwargs)
+                return NLMeans.Backend.CUDA.NLMeans(clip, *args, **kwargs)
 
             if hasattr(core, "knlm"):
                 return clip.knlm.KNLMeansCL(*args, **kwargs | dict(device_type="auto"))
 
             if hasattr(core, "nlm_ispc"):
-                return NLMeans.DeviceType.ISPC.NLMeans(clip, *args, **kwargs)
+                return NLMeans.Backend.ISPC.NLMeans(clip, *args, **kwargs)
 
             raise CustomRuntimeError(
                 "No compatible plugin found. Please install one from: "
@@ -143,7 +146,7 @@ def nl_means(
     d: int | Sequence[int] = 1,
     a: int | Sequence[int] = 2,
     s: int | Sequence[int] = 4,
-    device_type: NLMeans.DeviceType = NLMeans.DeviceType.AUTO,
+    backend: NLMeans.Backend = NLMeans.Backend.AUTO,
     rclip: vs.VideoNode | None = None,
     wmode: NLMeans.WeightMode = NLMeans.WeightMode.WELSCH,
     planes: PlanesT = None,
@@ -156,7 +159,7 @@ def nl_means(
 
     Example:
         ```py
-        denoised = nl_means(clip, 0.4, device_type=nl_means.DeviceType.CUDA, ...)
+        denoised = nl_means(clip, 0.4, backend=nl_means.Backend.CUDA, ...)
         ```
 
     :param clip:            Source clip.
@@ -173,8 +176,8 @@ def nl_means(
     :param s:               Similarity Radius. Similarity neighbourhood size = `(2 * s + 1) ** 2`.
                             Sets the radius of the similarity neighbourhood window.
                             The impact on performance is low, therefore it depends on the nature of the noise.
-    :param device_type:     Set the device to use for processing.
-    :param ref:             Reference clip to do weighting calculation.
+    :param backend:         Set the backend to use for processing.
+    :param rclip:           Reference clip to do weighting calculation.
     :param wmode:           Weighting function to use.
     :param planes:          Which planes to process.
     :param kwargs:          Additional arguments passed to the plugin.
@@ -204,7 +207,7 @@ def nl_means(
             params[kargs] = to_arr(kwargs.pop(sargs))
 
     def _nl_means(i: int, channels: str) -> vs.VideoNode:
-        return device_type.NLMeans(
+        return backend.NLMeans(
             clip,
             **{k: p[i] for k, p in params.items()},
             **dict(channels=channels, rclip=rclip, wmode=wmode, wref=wmode.wref) | kwargs

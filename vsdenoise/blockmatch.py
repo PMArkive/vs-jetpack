@@ -78,18 +78,30 @@ def wnnm(
     if ref is not None:
         ref = depth(ref, 32)
         ref = get_y(ref) if func.luma_only else ref
-        check_ref_clip(func.work_clip, ref, func.func)
 
-    return func.return_clip(
-        _recursive_denoise(
-            func.work_clip, core.wnnm.WNNM, self_refine and 'rclip' or None,
-            refine, merge_factor, planes, dict(
-                sigma=sigma, block_size=block_size, block_step=block_step, group_size=group_size,
-                bm_range=bm_range, radius=tr, ps_num=ps_num, ps_range=ps_range, rclip=ref,
-                adaptive_aggregation=adaptive_aggregation, residual=residual
+    denoised = cast(ConstantFormatVideoNode, None)
+    dkwargs = KwargsT(radius=radius, rclip=ref) | kwargs
+
+    for i in range(refine + 1):
+        if i == 0:
+            previous = func.work_clip
+        elif i == 1:
+            previous = denoised
+        else:
+            previous = norm_expr(
+                [func.work_clip, previous, denoised],
+                'x y - {merge_factor} * z +',
+                planes,
+                merge_factor=merge_factor,
+                func=func.func
             )
-        )
-    )
+
+        if self_refine and denoised:
+            dkwargs.update(rclip=denoised)
+
+        denoised = core.wnnm.WNNM(previous, sigma, **dkwargs)
+
+    return denoised
 
 
 # TODO: remove this when vs-stubs will be a thing™

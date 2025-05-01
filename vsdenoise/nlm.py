@@ -143,11 +143,11 @@ class NLMeans(Generic[P, R]):
 def nl_means(
     clip: vs.VideoNode,
     h: float | Sequence[float] = 1.2,
-    d: int | Sequence[int] = 1,
+    tr: int | Sequence[int] = 1,
     a: int | Sequence[int] = 2,
     s: int | Sequence[int] = 4,
     backend: NLMeans.Backend = NLMeans.Backend.AUTO,
-    rclip: vs.VideoNode | None = None,
+    ref: vs.VideoNode | None = None,
     wmode: NLMeans.WeightMode = NLMeans.WeightMode.WELSCH,
     planes: PlanesT = None,
     **kwargs: Any
@@ -165,10 +165,11 @@ def nl_means(
     :param clip:            Source clip.
     :param h:               Controls the strength of the filtering.
                             Larger values will remove more noise.
-    :param d:               Temporal Radius. Temporal size = `(2 * d + 1)`.
+    :param tr:              Temporal Radius. Temporal size = `(2 * d + 1)`.
                             Sets the number of past and future frames to uses for denoising the current frame.
                             d=0 uses 1 frame, while d=1 uses 3 frames and so on.
                             Usually, larger values result in better denoising.
+                            Also known as the `d` parameter.
     :param a:               Search Radius. Spatial size = `(2 * a + 1)^2`.
                             Sets the radius of the search window.
                             a=1 uses 9 pixel, while a=2 uses 25 pixels and so on.
@@ -177,7 +178,8 @@ def nl_means(
                             Sets the radius of the similarity neighbourhood window.
                             The impact on performance is low, therefore it depends on the nature of the noise.
     :param backend:         Set the backend to use for processing.
-    :param rclip:           Reference clip to do weighting calculation.
+    :param ref:             Reference clip to do weighting calculation.
+                            Also known as the `rclip` parameter.
     :param wmode:           Weighting function to use.
     :param planes:          Which planes to process.
     :param kwargs:          Additional arguments passed to the plugin.
@@ -192,17 +194,17 @@ def nl_means(
     if not planes:
         return clip
 
-    params = dict[str, list[float] | list[int]](h=to_arr(h), d=to_arr(d), a=to_arr(a), s=to_arr(s))
+    params = dict[str, list[float] | list[int]](h=to_arr(h), d=to_arr(tr), a=to_arr(a), s=to_arr(s))
 
     # TODO: Remove legacy support for old arguments.
     for sargs, kargs in zip(
-        ["strength", "tr", "sr", "simr"],
-        params.keys()
+        ["strength", "sr", "simr"],
+        ["h", "a", "s"]
     ):
         if sargs in kwargs:
             warnings.warn(
                 f"nl_means: '{sargs}' argument is deprecated, use '{kargs}' instead",
-                UserWarning
+                DeprecationWarning
             )
             params[kargs] = to_arr(kwargs.pop(sargs))
 
@@ -210,7 +212,7 @@ def nl_means(
         return backend.NLMeans(
             clip,
             **{k: p[i] for k, p in params.items()},
-            **dict(channels=channels, rclip=rclip, wmode=wmode, wref=wmode.wref) | kwargs
+            **dict(channels=channels, rclip=ref, wmode=wmode, wref=wmode.wref) | kwargs
         )
 
     if clip.format.color_family in {vs.GRAY, vs.RGB}:

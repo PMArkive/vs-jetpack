@@ -233,7 +233,7 @@ def based_aa(
 
     if not deinterlacer:
         deinterlacer = EEDI3(mclip=Bilinear.scale(mask, ss.width, ss.height) if mask else None, sclip=ss)
-        aa_kwargs = KwargsT(alpha=0.125, beta=0.25, vthresh0=12, vthresh1=24, field=1) | aa_kwargs
+        aa_kwargs = KwargsT(alpha=0.125, beta=0.25, vthresh0=12, vthresh1=24) | aa_kwargs
 
     aa = deinterlacer.antialias(ss, **aa_kwargs)
 

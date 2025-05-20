@@ -3,10 +3,9 @@ from dataclasses import dataclass, replace
 from enum import IntFlag, auto
 from typing import Any, Sequence
 
-from jetpytools import inject_self
 from typing_extensions import Self
 
-from vskernels import LeftShift, Scaler, TopShift
+from vskernels import Catrom, LeftShift, Scaler, TopShift, ComplexScalerLike, ComplexScaler
 from vstools import (
     ChromaLocation, ConstantFormatVideoNode, VSFunctionAllArgs, VSFunctionNoArgs, check_variable, core,
     normalize_seq, vs, vs_object
@@ -139,11 +138,12 @@ class AntiAliaser(Deinterlacer, ABC):
         return clip.std.Transpose()
 
 
+@dataclass(kw_only=True)
 class SuperSampler(AntiAliaser, Scaler, ABC):
     """Abstract base class for supersampling operations."""
 
-    # TODO: Change this when #94 is merged
-    @inject_self.cached
+    scaler: ComplexScalerLike = Catrom
+
     def scale(
         self,
         clip: vs.VideoNode,
@@ -167,8 +167,8 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
         dest_dimensions = list(self._wh_norm(clip, width, height))
         sy, sx = shift
 
-        cloc = list(ChromaLocation.get_offsets(clip, ChromaLocation.from_video(clip)))
-        subsampling = [2**clip.format.subsampling_w, 2**clip.format.subsampling_h]
+        cloc = list(ChromaLocation.from_video(clip).get_offsets(clip))
+        subsampling = [2 ** clip.format.subsampling_w, 2 ** clip.format.subsampling_h]
 
         nshift: list[list[float]] = [
             normalize_seq(sx, clip.format.num_planes),
@@ -189,12 +189,11 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
                 tff = False if delta < 0 else True if delta > 0 else self.tff
                 offset = -0.25 if tff else 0.25
 
-                # TODO: Change this when #94 is merged
                 for y in range(clip.format.num_planes):
                     if not y:
                         nshift[x][y] = (nshift[x][y] + offset) * 2
                     else:
-                        nshift[x][y] = (nshift[x][y] + offset * subsampling[x]) * 2 - cloc[x]
+                        nshift[x][y] = (nshift[x][y] + offset) * 2 - cloc[x] / subsampling[x]
 
                 if is_width:
                     clip = self.transpose(clip)
@@ -207,8 +206,9 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
         if not self.transpose_first:
             nshift.reverse()
 
-        # TODO: Change this when #94 is merged
-        return clip.fmtc.resample(width, height, nshift[0], nshift[1])
+        return ComplexScaler.ensure_obj(self.scaler, self.__class__).scale(  # type: ignore[return-value]
+            clip, width, height, (nshift[1], nshift[0])
+        )
 
 
 @dataclass
@@ -303,8 +303,7 @@ class NNEDI3(SuperSampler, AntiAliaser):
             pscrn=self.pscrn
         ) | kwargs
 
-    # TODO: Change this when #94 is merged
-    @inject_self.cached.property
+    @Scaler.cached_property
     def kernel_radius(self) -> int:
         match self.nsize:
             case 0 | 4:
@@ -422,8 +421,7 @@ class EEDI2(SuperSampler, AntiAliaser):
             pp=self.pp
         ) | kwargs
 
-    # TODO: Change this when #94 is merged
-    @inject_self.cached.property
+    @Scaler.cached_property
     def kernel_radius(self) -> int:
         return self.maxd
 
@@ -583,8 +581,7 @@ class EEDI3(SuperSampler, AntiAliaser):
 
         return kwargs
 
-    # TODO: Change this when #94 is merged
-    @inject_self.cached.property
+    @Scaler.cached_property
     def kernel_radius(self) -> int:
         return self.mdis
 

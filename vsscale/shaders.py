@@ -5,8 +5,8 @@ from typing import Any
 
 from jetpytools import SPath, SPathLike
 
-from vskernels import Catrom, KernelT, ScalerT
-from vstools import ConstantFormatVideoNode, check_variable, core, depth, inject_self, join, vs
+from vskernels import Catrom, KernelLike, ScalerLike
+from vstools import ConstantFormatVideoNode, check_variable, core, depth, join, vs
 
 from .generic import BaseGenericScaler
 
@@ -24,16 +24,15 @@ class PlaceboShader(BaseGenericScaler):
         self,
         shader: str | SPathLike,
         *,
-        kernel: KernelT = Catrom,
-        scaler: ScalerT | None = None,
-        shifter: KernelT | None = None,
+        kernel: KernelLike = Catrom,
+        scaler: ScalerLike | None = None,
+        shifter: KernelLike | None = None,
         **kwargs: Any
     ) -> None:
         super().__init__(kernel=kernel, scaler=scaler, shifter=shifter, **kwargs)
 
         self.shader = SPath(shader).resolve().to_str()
 
-    @inject_self.cached
     def scale(
         self,
         clip: vs.VideoNode,

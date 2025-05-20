@@ -151,7 +151,7 @@ def nl_means(
     wmode: NLMeans.WeightMode = NLMeans.WeightMode.WELSCH,
     planes: PlanesT = None,
     **kwargs: Any
-) -> vs.VideoNode:
+) -> ConstantFormatVideoNode:
     """
     Convenience wrapper for NLMeans implementations.
 
@@ -208,7 +208,7 @@ def nl_means(
             )
             params[kargs] = to_arr(kwargs.pop(sargs))
 
-    def _nl_means(i: int, channels: str) -> vs.VideoNode:
+    def _nl_means(i: int, channels: str) -> ConstantFormatVideoNode:
         return backend.NLMeans(
             clip,
             **{k: p[i] for k, p in params.items()},

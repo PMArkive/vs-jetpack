@@ -13,7 +13,7 @@ from vstools import (
     normalize_seq, scale_delta, vs
 )
 
-from .mvtools import MotionVectors, MVTools, MVToolsPreset, MVToolsPresets
+from .mvtools import MotionVectors, MVTools, MVToolsPreset
 from .prefilters import PrefilterPartial
 
 __all__ = [
@@ -27,7 +27,7 @@ def mc_degrain(
     clip: vs.VideoNode, vectors: MotionVectors | None = None,
     prefilter: vs.VideoNode | PrefilterPartial | VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | None = None,
     mfilter: vs.VideoNode | VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | None = None,
-    preset: MVToolsPreset = MVToolsPresets.HQ_SAD, tr: int = 1,
+    preset: MVToolsPreset = MVToolsPreset.HQ_SAD, tr: int = 1,
     blksize: int | tuple[int, int] = 16, refine: int = 1,
     thsad: int | tuple[int, int] = 400, thsad2: int | tuple[int | None, int | None] | None = None,
     thsad_recalc: int | None = None, limit: int | tuple[int | None, int | None] | None = None,
@@ -42,7 +42,7 @@ def mc_degrain(
     clip: vs.VideoNode, vectors: MotionVectors | None = None,
     prefilter: vs.VideoNode | PrefilterPartial | VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | None = None,
     mfilter: vs.VideoNode | VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | None = None,
-    preset: MVToolsPreset = MVToolsPresets.HQ_SAD, tr: int = 1,
+    preset: MVToolsPreset = MVToolsPreset.HQ_SAD, tr: int = 1,
     blksize: int | tuple[int, int] = 16, refine: int = 1,
     thsad: int | tuple[int, int] = 400, thsad2: int | tuple[int | None, int | None] | None = None,
     thsad_recalc: int | None = None, limit: int | tuple[int | None, int | None] | None = None,
@@ -57,7 +57,7 @@ def mc_degrain(
     clip: vs.VideoNode, vectors: MotionVectors | None = None,
     prefilter: vs.VideoNode | PrefilterPartial | VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | None = None,
     mfilter: vs.VideoNode | VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | None = None,
-    preset: MVToolsPreset = MVToolsPresets.HQ_SAD, tr: int = 1,
+    preset: MVToolsPreset = MVToolsPreset.HQ_SAD, tr: int = 1,
     blksize: int | tuple[int, int] = 16, refine: int = 1,
     thsad: int | tuple[int, int] = 400, thsad2: int | tuple[int | None, int | None] | None = None,
     thsad_recalc: int | None = None, limit: int | tuple[int | None, int | None] | None = None,
@@ -71,7 +71,7 @@ def mc_degrain(
     clip: vs.VideoNode, vectors: MotionVectors | None = None,
     prefilter: vs.VideoNode | PrefilterPartial | VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | None = None,
     mfilter: vs.VideoNode | VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | None = None,
-    preset: MVToolsPreset = MVToolsPresets.HQ_SAD, tr: int = 1,
+    preset: MVToolsPreset = MVToolsPreset.HQ_SAD, tr: int = 1,
     blksize: int | tuple[int, int] = 16, refine: int = 1,
     thsad: int | tuple[int, int] = 400, thsad2: int | tuple[int | None, int | None] | None = None,
     thsad_recalc: int | None = None, limit: int | tuple[int | None, int | None] | None = None,

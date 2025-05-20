@@ -58,7 +58,7 @@ jobs:
       - name: Set up vszip
         uses: ./.github/actions/setup-vszip
         with:
-          vszip-version: 5
+          vszip-version: 6
 
       - name: Install dependencies
         run: |

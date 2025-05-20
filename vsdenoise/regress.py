@@ -6,7 +6,7 @@ from typing import Any, Callable, ClassVar, Concatenate, Sequence
 
 from vsaa import EEDI3, NNEDI3, SangNom
 from vsexprtools import ExprOp, complexpr_available, norm_expr
-from vskernels import Catrom, Kernel, KernelT, Point, Scaler, ScalerT
+from vskernels import Catrom, Kernel, KernelLike, Point, Scaler, ScalerLike
 from vsrgtools import box_blur, gauss_blur, limit_filter
 from vsscale import ScalingArgs
 from vstools import (
@@ -83,7 +83,7 @@ class Regression:
 
         @classmethod
         def from_param(
-            self, func: Callable[Concatenate[vs.VideoNode, P1], vs.VideoNode] | Regression.BlurConf,
+            cls, func: Callable[Concatenate[vs.VideoNode, P1], vs.VideoNode] | Regression.BlurConf,
             *args: P1.args, **kwargs: P1.kwargs
         ) -> Regression.BlurConf:
             """
@@ -111,8 +111,8 @@ class Regression:
             :return:            :py:attr:`BlurConf` object.
             """
             if args or kwargs:
-                return Regression.BlurConf(
-                    self.func, *(args or self.args), **(self.kwargs | kwargs)  # type: ignore[arg-type]
+                return Regression.BlurConf(  # pyright: ignore
+                    self.func, *(args or self.args), **(self.kwargs | kwargs)
                 )
             return self
 
@@ -150,7 +150,7 @@ class Regression:
                             return outc
 
                 try:
-                    out = self.func(clip, *args, **ckwargs)  # type: ignore[arg-type]
+                    out = self.func(clip, *args, **ckwargs)
                 except Exception:
                     ...
 
@@ -216,18 +216,18 @@ class Regression:
 
             return blur, variation, var_mul
 
-    blur_func: BlurConf | VSFunction = BlurConf(box_blur, radius=2)
+    blur_func: BlurConf | VSFunction[vs.VideoNode] = BlurConf(box_blur, radius=2)
     """Function used for blurring (averaging)."""
 
     eps: float = 1e-7
     """Epsilon, used in expressions to avoid division by zero."""
 
     def __post_init__(self) -> None:
-        self.blur_conf = Regression.BlurConf.from_param(self.blur_func)  # type: ignore
+        self.blur_conf = Regression.BlurConf.from_param(self.blur_func)
 
     @classmethod
     def from_param(
-        self, func: Callable[Concatenate[vs.VideoNode, P1], vs.VideoNode] | Regression.BlurConf,
+        cls, func: Callable[Concatenate[vs.VideoNode, P1], vs.VideoNode] | Regression.BlurConf,
         *args: P1.args, **kwargs: P1.kwargs
     ) -> Regression:
         """
@@ -425,10 +425,10 @@ class ChromaReconstruct(ABC):
         - https://github.com/Jaded-Encoding-Thaumaturgy/vapoursynth-reconstruct
     """
 
-    kernel: KernelT = field(default=Catrom, kw_only=True)
+    kernel: KernelLike = field(default=Catrom, kw_only=True)
     """Base kernel used to shift/scale luma and chroma planes."""
 
-    scaler: ScalerT | None = field(default=None, kw_only=True)
+    scaler: ScalerLike | None = field(default=None, kw_only=True)
     """Base kernel used to shift/scale luma and chroma planes."""
 
     _default_diff_sigma: ClassVar[float] = 0.5
@@ -436,7 +436,7 @@ class ChromaReconstruct(ABC):
 
     def __post_init__(self) -> None:
         self._kernel = Kernel.ensure_obj(self.kernel)
-        self._scaler = self._kernel.ensure_obj(self.scaler)
+        self._scaler = Scaler.ensure_obj(self.scaler or self._kernel)
 
     @abstractmethod
     def get_base_clip(self, clip: vs.VideoNode) -> vs.VideoNode:
@@ -487,7 +487,7 @@ class ChromaReconstruct(ABC):
         return (0.5 * c_width / y_width)
 
     def _get_bases(self, clip: vs.VideoNode, include_edges: bool, func: FuncExceptT) -> tuple[
-        vs.VideoNode, vs.VideoNode, vs.VideoNode, vs.VideoNode, list[vs.VideoNode], list[vs.VideoNode]
+        vs.VideoNode, vs.VideoNode, vs.VideoNode, vs.VideoNode, Sequence[vs.VideoNode], Sequence[vs.VideoNode]
     ]:
         InvalidColorFamilyError.check(clip, vs.YUV, func)
 
@@ -553,7 +553,7 @@ class ChromaReconstruct(ABC):
 
         y, y_base, y_m, y_dm, chroma_base, chroma_dm = self._get_bases(clip, include_edges, self.reconstruct)
 
-        reg = Regression.from_param(Regression.BlurConf(gauss_blur, sigma=sigma))
+        reg = Regression.from_param(Regression.BlurConf(gauss_blur, sigma=sigma))  #pyright: ignore
 
         if not isinstance(diff_mode, ReconDiffModeConf):
             diff_mode = diff_mode()
@@ -567,7 +567,7 @@ class ChromaReconstruct(ABC):
         )
 
         fixup = (
-            y_diff.recon.Reconstruct(
+            y_diff.recon.Reconstruct(  # type: ignore
                 reg.slope, reg.correlation, radius=radius, intercept=(
                     None if diff_mode.inter_scale == 0.0 else reg.intercept
                 )
@@ -596,7 +596,7 @@ class ChromaReconstruct(ABC):
             if out_mode == ReconOutput.i420:
                 targ_sizes = tuple[int, int](targ_size // 2 for targ_size in targ_sizes)  # type: ignore
 
-            shifted_chroma = (self._scaler.scale(p, *targ_sizes) for p in shifted_chroma)
+            shifted_chroma = (self._scaler.scale(p, *targ_sizes) for p in shifted_chroma)  # type: ignore
 
         return depth(join(y_base, *shifted_chroma), clip)
 
@@ -612,7 +612,7 @@ class GenericChromaRecon(ChromaReconstruct):
     native_res: int | float | None = None
     """Native resolution of the show."""
 
-    native_kernel: KernelT = Catrom
+    native_kernel: KernelLike = Catrom
     """Native kernel of the show."""
 
     src_left: float = field(default=0.5, kw_only=True)
@@ -644,7 +644,7 @@ class GenericChromaRecon(ChromaReconstruct):
     def get_mangled_luma(self, clip: vs.VideoNode, y_base: vs.VideoNode) -> vs.VideoNode:
         c_width, c_height = get_plane_sizes(clip, 1)
 
-        return Catrom.scale(
+        return Catrom().scale(
             y_base, c_width, c_height, (0, -0.5 + self.get_chroma_shift(clip.width, c_width))
         )
 
@@ -676,10 +676,10 @@ class MissingFieldsChromaRecon(GenericChromaRecon):
     Base helper function for reconstructing chroma with missing fields.
     """
 
-    dm_wscaler: ScalerT = NNEDI3
+    dm_wscaler: ScalerLike = NNEDI3
     """Scaler used to interpolate the width/height."""
 
-    dm_hscaler: ScalerT | None = NNEDI3
+    dm_hscaler: ScalerLike | None = NNEDI3
     """Scaler used to interpolate the height."""
 
     def __post_init__(self) -> None:
@@ -717,21 +717,23 @@ class PAWorksChromaRecon(MissingFieldsChromaRecon):
             demanglers to the original descaled luma or details would just get crushed.
 
     """
-    dm_wscaler: ScalerT = field(default_factory=lambda: SangNom(128))
-    dm_hscaler: ScalerT = NNEDI3
+    dm_wscaler: ScalerLike = field(default_factory=lambda: SangNom(128))
+    dm_hscaler: ScalerLike = NNEDI3
 
     def get_mangled_luma(self, clip: vs.VideoNode, y_base: vs.VideoNode) -> vs.VideoNode:
         cm_width, _ = get_plane_sizes(y_base, 1)
         c_width, c_height = get_plane_sizes(clip, 1)
 
-        y_m = Point.scale(y_base, cm_width // 2, y_base.height, (0, -1))
-        y_m = Point.scale(y_m, c_width, y_base.height, (0, -0.25))
-        y_m = Catrom.scale(y_m, c_width, c_height)
+        point = Point()
+
+        y_m = point.scale(y_base, cm_width // 2, y_base.height, (0, -1))
+        y_m = point.scale(y_m, c_width, y_base.height, (0, -0.25))
+        y_m = Catrom().scale(y_m, c_width, c_height)
 
         return y_m
 
     def demangle_chroma(self, mangled: vs.VideoNode, y_base: vs.VideoNode) -> vs.VideoNode:
-        demangled = Point.scale(mangled, y_base.width // 2, mangled.height)
+        demangled = vs.core.resize.Point(mangled, y_base.width // 2, mangled.height)
 
         demangled = self._dm_wscaler.scale(demangled, mangled.width, y_base.height, (self.src_top, 0))
         demangled = self._dm_hscaler.scale(demangled, y_base.width, y_base.height, (0, self.src_left))
@@ -762,8 +764,8 @@ class Point422ChromaRecon(MissingFieldsChromaRecon):
     Demangler for content that has undergone from 4:4:4 => 4:2:2 with point, then 4:2:0 with some neutral scaler.
     """
 
-    dm_wscaler: ScalerT = field(default_factory=lambda: SangNom(128))
-    dm_hscaler: ScalerT = field(
+    dm_wscaler: ScalerLike = field(default_factory=lambda: SangNom(128))
+    dm_hscaler: ScalerLike = field(
         # sclip=NNEDI3() didn't work before and has not been re-implemented either
         default_factory=lambda: EEDI3(0.35, 0.55, 20, 2, 10, vcheck=3, sclip=NNEDI3())  # type: ignore
     )

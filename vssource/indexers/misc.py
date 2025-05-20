@@ -105,3 +105,9 @@ class FFMS2(Indexer):
     """FFmpegSource2 indexer"""
 
     _source_func = core.lazy.ffms2.Source
+
+
+class ZipSource(Indexer):
+    """vszip image reader indexer"""
+
+    _source_func = core.lazy.vszip.ImageRead

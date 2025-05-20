@@ -7,7 +7,7 @@ from typing import Any, Sequence, cast
 from vsaa import Nnedi3
 from vsdenoise import Prefilter, PrefilterT, frequency_merge, nl_means
 from vsexprtools import ExprOp, ExprToken, norm_expr
-from vskernels import Catrom, NoShift, Point, Scaler, ScalerT
+from vskernels import Catrom, Point, Scaler, ScalerLike
 from vsmasktools import Morpho, Prewitt
 from vsrgtools import (
     LimitFilterMode, contrasharpening, contrasharpening_dehalo, gauss_blur, limit_filter, median_blur, repair
@@ -30,8 +30,8 @@ def smooth_dering(
     mrad: int = 1, msmooth: int = 1, minp: int = 1, mthr: float = 0.24, incedge: bool = False,
     thr: int = 12, elast: float = 2.0, darkthr: int | None = None,
     contra: int | float | bool = 1.2, drrep: int = 13, pre_ss: float = 1.0,
-    pre_supersampler: ScalerT = Nnedi3(0, field=0, shifter=NoShift),
-    pre_downscaler: ScalerT = Point, planes: PlanesT = 0, show_mask: bool = False
+    pre_supersampler: ScalerLike = Nnedi3(0, field=0),
+    pre_downscaler: ScalerLike = Point, planes: PlanesT = 0, show_mask: bool = False
 ) -> vs.VideoNode:
     """
     Applies deringing by using a smart smoother near edges (where ringing
@@ -114,7 +114,7 @@ def smooth_dering(
 
     if contra:
         if isinstance(contra, int):
-            smoothed = contrasharpening(smoothed, work_clip, contra, mode=13, planes=planes)
+            smoothed = contrasharpening(smoothed, work_clip, contra, mode=repair.Mode(13), planes=planes)
         else:
             smoothed = contrasharpening_dehalo(smoothed, work_clip, contra, planes=planes)
 
@@ -165,7 +165,7 @@ def smooth_dering(
 
 def vine_dehalo(
     clip: vs.VideoNode, strength: float | Sequence[float] = 16.0, sharp: float = 0.5, sigma: float | list[float] = 1.0,
-    supersampler: ScalerT = Nnedi3, downscaler: ScalerT = Catrom, planes: PlanesT = 0, **kwargs: Any
+    supersampler: ScalerLike = Nnedi3, downscaler: ScalerLike = Catrom, planes: PlanesT = 0, **kwargs: Any
 ) -> vs.VideoNode:
     """
     Dehalo via non-local errors filtering.
@@ -202,7 +202,7 @@ def vine_dehalo(
 
     supersampled = supersampler.supersample(func.work_clip)
     supersampled = nl_means(supersampled, strength, tr=0, simr=0, **kwargs)
-    supersampled = downscaler.scale(supersampled, func.work_clip.width, func.work_clip.height)
+    supersampled = downscaler.scale(supersampled, func.work_clip.width, func.work_clip.height)  # type: ignore[assignment]
 
     smoothed = nl_means(func.work_clip, strength, tr=0, simr=0, **kwargs)
     smoothed = core.std.Merge(supersampled, smoothed, weight)

@@ -4,13 +4,13 @@ from functools import partial
 from typing import TYPE_CHECKING, Any, Literal
 
 from vsexprtools import ExprOp, combine, complexpr_available, expr_func, norm_expr
-from vskernels import Catrom, Hermite, KernelT, LinearScaler, Scaler, ScalerT
+from vskernels import Catrom, Hermite, KernelLike, LinearScaler, Scaler, ScalerLike
 from vsmasktools import ringing_mask
 from vsrgtools import box_blur, gauss_blur
 from vsrgtools.rgtools import Repair
 from vstools import (
     ConstantFormatVideoNode, CustomOverflowError, PlanesT, VSFunctionNoArgs, check_ref_clip, check_variable,
-    check_variable_format, core, inject_self, scale_delta, vs
+    check_variable_format, core, scale_delta, vs
 )
 
 from .generic import BaseGenericScaler, GenericScaler
@@ -27,8 +27,8 @@ class ClampScaler(GenericScaler):
 
     def __init__(
         self,
-        base_scaler: ScalerT,
-        reference: ScalerT | vs.VideoNode,
+        base_scaler: ScalerLike,
+        reference: ScalerLike | vs.VideoNode,
         strength: int = 80,
         overshoot: float | None = None,
         undershoot: float | None = None,
@@ -36,9 +36,9 @@ class ClampScaler(GenericScaler):
         operator: Literal[ExprOp.MAX, ExprOp.MIN] | None = ExprOp.MIN,
         masked: bool = True,
         *,
-        kernel: KernelT = Catrom,
-        scaler: ScalerT | None = None,
-        shifter: KernelT | None = None,
+        kernel: KernelLike = Catrom,
+        scaler: ScalerLike | None = None,
+        shifter: KernelLike | None = None,
         **kwargs: Any
     ) -> None:
         """
@@ -85,7 +85,6 @@ class ClampScaler(GenericScaler):
 
         super().__init__(None, kernel=kernel, scaler=scaler, shifter=shifter, **kwargs)
 
-    @inject_self.cached
     def scale(
         self,
         clip: vs.VideoNode,
@@ -146,7 +145,7 @@ class ClampScaler(GenericScaler):
 
         return merged
 
-    @inject_self.cached.property
+    @Scaler.cached_property
     def kernel_radius(self) -> int:
         if not isinstance(self.reference, vs.VideoNode):
             return max(self.reference.kernel_radius, self.base_scaler.kernel_radius)
@@ -159,7 +158,7 @@ class DPID(BaseGenericScaler):
     def __init__(
         self,
         sigma: float = 0.1,
-        ref: vs.VideoNode | ScalerT = Catrom,
+        ref: vs.VideoNode | ScalerLike = Catrom,
         planes: PlanesT = None,
         **kwargs: Any
     ) -> None:
@@ -181,7 +180,6 @@ class DPID(BaseGenericScaler):
         else:
             self._ref_scaler = Scaler.ensure_obj(ref, self.__class__)
 
-    @inject_self.cached
     def scale(
         self,
         clip: vs.VideoNode,
@@ -214,7 +212,7 @@ class DPID(BaseGenericScaler):
 
         return core.dpid.DpidRaw(clip, ref, **kwargs)
 
-    @inject_self.cached.property
+    @Scaler.cached_property
     def kernel_radius(self) -> int:
         return self._ref_scaler.kernel_radius
 
@@ -235,7 +233,7 @@ class SSIM(LinearScaler):
 
     def __init__(
         self,
-        scaler: ScalerT = Hermite,
+        scaler: ScalerLike = Hermite,
         smooth: int | float | VSFunctionNoArgs[vs.VideoNode, ConstantFormatVideoNode] | None = None,
         **kwargs: Any
     ) -> None:
@@ -251,7 +249,7 @@ class SSIM(LinearScaler):
         """
         super().__init__(**kwargs)
 
-        self.scaler = Hermite.from_param(scaler)
+        self.scaler = Scaler.from_param(scaler)()
 
         if smooth is None:
             smooth = (self.scaler.kernel_radius + 1.0) / 3
@@ -264,7 +262,12 @@ class SSIM(LinearScaler):
             self.filter_func = partial(gauss_blur, sigma=smooth)
 
     def _linear_scale(
-        self, clip: vs.VideoNode, width: int, height: int, shift: tuple[float, float] = (0, 0), **kwargs: Any
+        self,
+        clip: vs.VideoNode,
+        width: int | None,
+        height: int | None,
+        shift: tuple[float, float],
+        **kwargs: Any,
     ) -> vs.VideoNode:
         assert check_variable(clip, self.scale)
 
@@ -287,6 +290,6 @@ class SSIM(LinearScaler):
 
         return expr_func([self.filter_func(m), self.filter_func(r), l1, self.filter_func(t)], 'x y z * + a -')
 
-    @inject_self.cached.property
+    @Scaler.cached_property
     def kernel_radius(self) -> int:
         return self.scaler.kernel_radius

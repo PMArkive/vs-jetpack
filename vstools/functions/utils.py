@@ -753,6 +753,7 @@ def limiter(
     max_val: float | Sequence[float] | None = None,
     *,
     tv_range: bool = False,
+    planes: PlanesT = None,
     func: FuncExceptT | None = None
 ) -> ConstantFormatVideoNode:
     """
@@ -765,6 +766,7 @@ def limiter(
     :param max_val:     Upper bound. Defaults to the highest allowed value for the input.
                         Can be specified for each plane individually.
     :param tv_range:    Changes min/max defaults values to LIMITED.
+    :param planes:      Planes to process.
     :param func:        Function returned for custom error handling.
                         This should only be set by VS package developers.
     :return:            Clamped clip.
@@ -779,6 +781,7 @@ def limiter(
     max_val: float | Sequence[float] | None = None,
     *,
     tv_range: bool = False,
+    planes: PlanesT = None,
     func: FuncExceptT | None = None
 ) -> Callable[P, ConstantFormatVideoNode]:
     """
@@ -793,6 +796,7 @@ def limiter(
     :param max_val:     Upper bound. Defaults to the highest allowed value for the input.
                         Can be specified for each plane individually.
     :param tv_range:    Changes min/max defaults values to LIMITED.
+    :param planes:      Planes to process.
     :param func:        Function returned for custom error handling.
                         This should only be set by VS package developers.
     :return:            Decorated function.
@@ -805,6 +809,7 @@ def limiter(
     min_val: float | Sequence[float] | None = None,
     max_val: float | Sequence[float] | None = None,
     tv_range: bool = False,
+    planes: PlanesT = None,
     func: FuncExceptT | None = None
 ) -> Callable[[Callable[P, ConstantFormatVideoNode]], Callable[P, ConstantFormatVideoNode]]:
     """
@@ -818,6 +823,7 @@ def limiter(
     :param max_val:     Upper bound. Defaults to the highest allowed value for the input.
                         Can be specified for each plane individually.
     :param tv_range:    Changes min/max defaults values to LIMITED.
+    :param planes:      Planes to process.
     :param func:        Function returned for custom error handling.
                         This should only be set by VS package developers.
     :return:            Decorated function.
@@ -831,18 +837,36 @@ def limiter(
     max_val: float | Sequence[float] | None = None,
     *,
     tv_range: bool = False,
+    planes: PlanesT = None,
     func: FuncExceptT | None = None
 ) -> Union[
     ConstantFormatVideoNode,
     Callable[P, ConstantFormatVideoNode],
     Callable[[Callable[P, ConstantFormatVideoNode]], Callable[P, ConstantFormatVideoNode]]
 ]:
+    """
+    Wraps `vs-zip <https://github.com/dnjulek/vapoursynth-zip>`.Limiter but only processes
+    if clip format is not integer, a min/max val is specified or tv_range is True.
+
+    :param clip_or_func:    Clip to process or function that returns a VideoNode to be processed.
+    :param min_val:         Lower bound. Defaults to the lowest allowed value for the input.
+                            Can be specified for each plane individually.
+    :param max_val:         Upper bound. Defaults to the highest allowed value for the input.
+                            Can be specified for each plane individually.
+    :param tv_range:        Changes min/max defaults values to LIMITED.
+    :param planes:          Planes to process.
+    :param func:            Function returned for custom error handling.
+                            This should only be set by VS package developers.
+    :return:                Clamped clip.
+    """
     if callable(clip_or_func):
         _func = clip_or_func
 
         @wraps(_func)
         def _wrapper(*args: P.args, **kwargs: P.kwargs) -> ConstantFormatVideoNode:
-            return limiter(_func(*args, **kwargs), min_val, max_val, tv_range=tv_range, func=func or _func)
+            return limiter(
+                _func(*args, **kwargs), min_val, max_val, tv_range=tv_range, planes=planes, func=func or _func
+            )
 
         return _wrapper
 
@@ -850,7 +874,7 @@ def limiter(
     clip = clip_or_func
 
     if clip is None:
-        return partial(limiter, min_val=min_val, max_val=max_val, tv_range=tv_range, func=func)
+        return partial(limiter, min_val=min_val, max_val=max_val, tv_range=tv_range, planes=planes, func=func)
 
     assert check_variable_format(clip, func)
 
@@ -868,4 +892,4 @@ def limiter(
         min_val = normalize_seq(min_val or get_lowest_values(clip, clip), clip.format.num_planes)
         max_val = normalize_seq(max_val or get_peak_values(clip, clip), clip.format.num_planes)
 
-    return clip.vszip.Limiter(min_val, max_val, tv_range)
+    return clip.vszip.Limiter(min_val, max_val, tv_range, planes)

@@ -9,8 +9,7 @@ from typing_extensions import Self
 from vsaa import Deinterlacer, NNEDI3
 from vsdeband import AddNoise
 from vsdenoise import (
-    DFTTest, MaskMode, MotionVectors, MVDirection, MVTools, MVToolsPreset, MVToolsPresets, mc_clamp,
-    prefilter_to_full_range
+    DFTTest, MaskMode, MotionVectors, MVDirection, MVTools, MVToolsPreset, mc_clamp, prefilter_to_full_range
 )
 from vsexprtools import norm_expr
 from vsmasktools import Coordinates, Morpho
@@ -912,7 +911,7 @@ class QTempGaussMC(vs_object):
         self,
         *,
         force_tr: int = 1,
-        preset: MVToolsPreset = MVToolsPresets.HQ_SAD,
+        preset: MVToolsPreset = MVToolsPreset.HQ_SAD,
         blksize: int | tuple[int, int] = 16,
         refine: int = 1,
         thsad_recalc: int | None = None,

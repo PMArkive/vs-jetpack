@@ -22,9 +22,12 @@ __all__ = [
 
 
 def contrasharpening(
-    flt: vs.VideoNode, src: vs.VideoNode, radius: int | list[int] = 1,
+    flt: vs.VideoNode,
+    src: vs.VideoNode,
+    radius: int = 1,
     sharp: vs.VideoNode | GenericVSFunction[vs.VideoNode] | None = None,
-    mode: Repair.Mode = repair.Mode.MINMAX_SQUARE3, planes: PlanesT = 0
+    mode: Repair.Mode = repair.Mode.MINMAX_SQUARE3,
+    planes: PlanesT = 0
 ) -> ConstantFormatVideoNode:
     """
     contra-sharpening: sharpen the denoised clip, but don't add more to any pixel than what was previously removed.
@@ -53,7 +56,7 @@ def contrasharpening(
         sharp = sharp
     else:
         damp = min_blur(flt, radius, planes=planes)
-        blurred = BlurMatrix.BINOMIAL(radius=radius)(damp, planes=planes)
+        blurred = BlurMatrix.BINOMIAL(taps=radius)(damp, planes=planes)
 
     # Difference of a simple kernel blur
     diff_blur = core.std.MakeDiff(
@@ -105,7 +108,8 @@ def contrasharpening_dehalo(
 
 
 def contrasharpening_median(
-    flt: vs.VideoNode, src: vs.VideoNode,
+    flt: vs.VideoNode,
+    src: vs.VideoNode,
     mode: int | Sequence[int] | RemoveGrain.Mode | Callable[..., ConstantFormatVideoNode] = box_blur,
     planes: PlanesT = 0
 ) -> ConstantFormatVideoNode:

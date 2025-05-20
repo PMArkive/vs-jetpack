@@ -69,7 +69,7 @@ class Deinterlacer(vs_object, ABC):
 
 @dataclass(kw_only=True)
 class AntiAliaser(Deinterlacer, ABC):
-    """Abstract base class for deinterlacing operations."""
+    """Abstract base class for anti-aliasing operations."""
 
     transpose_first: bool = False
     """Transpose the clip before any operation."""

@@ -13,17 +13,15 @@ from vstools import (
 )
 
 
-class AADirection(IntFlag):
-    VERTICAL = auto()
-    HORIZONTAL = auto()
-    BOTH = VERTICAL | HORIZONTAL
-
-
 @dataclass(kw_only=True)
 class Deinterlacer(vs_object, ABC):
     tff: bool = False
     double_rate: bool = True
     transpose_first: bool = False
+    class AADirection(IntFlag):
+        VERTICAL = auto()
+        HORIZONTAL = auto()
+        BOTH = VERTICAL | HORIZONTAL
 
     @property
     @abstractmethod
@@ -49,9 +47,9 @@ class Deinterlacer(vs_object, ABC):
     ) -> ConstantFormatVideoNode:
         assert check_variable(clip, self.antialias)
 
-        for y in sorted((aa_dir for aa_dir in AADirection), key=lambda x: x.value, reverse=self.transpose_first):
-            if direction in (y, AADirection.BOTH):
-                if y == AADirection.HORIZONTAL:
+        for y in sorted((aa_dir for aa_dir in self.AADirection), key=lambda x: x.value, reverse=self.transpose_first):
+            if direction in (y, self.AADirection.BOTH):
+                if y == self.AADirection.HORIZONTAL:
                     clip = self.transpose(clip)
 
                 clip = self.deinterlace(clip, **kwargs)
@@ -59,7 +57,7 @@ class Deinterlacer(vs_object, ABC):
                 if self.double_rate:
                     clip = core.std.Merge(clip[::2], clip[1::2])
 
-                if y == AADirection.HORIZONTAL:
+                if y == self.AADirection.HORIZONTAL:
                     clip = self.transpose(clip)
 
         return clip

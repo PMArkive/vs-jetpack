@@ -13,7 +13,7 @@ from vstools import (
     check_variable_format, fallback, get_peak_value, get_y, limiter, scale_mask, vs, ConvMode
 )
 
-from .deinterlacers import AADirection, Deinterlacer, NNEDI3, EEDI3
+from .deinterlacers import Deinterlacer, NNEDI3, EEDI3
 
 __all__ = [
     'pre_aa',
@@ -28,22 +28,23 @@ def pre_aa(
         unsharpen, blur=partial(gauss_blur, mode=ConvMode.VERTICAL, sigma=1)
     ),
     deinterlacer: Deinterlacer = NNEDI3(),
-    direction: AADirection = AADirection.BOTH,
+    direction: Deinterlacer.AADirection = Deinterlacer.AADirection.BOTH,
     planes: PlanesT = None,
 ) -> vs.VideoNode:
     func = FunctionUtil(clip, pre_aa, planes)
 
     wclip = func.work_clip
-    for x in AADirection:
-        if direction in (x, AADirection.BOTH):
-            if x == AADirection.HORIZONTAL:
+
+    for x in Deinterlacer.AADirection:
+        if direction in (x, Deinterlacer.AADirection.BOTH):
+            if x == Deinterlacer.AADirection.HORIZONTAL:
                 wclip = deinterlacer.transpose(wclip)
 
-            aa = deinterlacer.antialias(wclip, AADirection.VERTICAL)
+            aa = deinterlacer.antialias(wclip, Deinterlacer.AADirection.VERTICAL)
             sharp = sharpener(wclip)
             limit = MeanMode.MEDIAN(wclip, aa, sharp)
 
-            if x == AADirection.HORIZONTAL:
+            if x == Deinterlacer.AADirection.HORIZONTAL:
                 wclip = deinterlacer.transpose(limit)
 
     return func.return_clip(wclip)

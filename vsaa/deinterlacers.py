@@ -197,47 +197,55 @@ class SuperSampler(Deinterlacer, Scaler, ABC):
 class NNEDI3(SuperSampler, Deinterlacer):
     """
     Neural Network Edge Directed Interpolation (3rd gen.)
+
+    More informations: https://github.com/sekrit-twc/znedi3
     """
 
-    nsize: int | None = None
+    nsize: int = 0
     """
     Size of the local neighbourhood around each pixel used by the predictor neural network.
     Possible settings:
-    - 0: 8x6
-    - 1: 16x6
-    - 2: 32x6
-    - 3: 48x6
-    - 4: 8x4
-    - 5: 16x4
-    - 6: 32x4
+        - 0: 8x6
+        - 1: 16x6
+        - 2: 32x6
+        - 3: 48x6
+        - 4: 8x4
+        - 5: 16x4
+        - 6: 32x4
+
+    Wrapper default is 0, plugin default is 6.
     """
 
-    nns: int | None = None
+    nns: int = 4
     """
     Number of neurons in the predictor neural network. Possible values:
-    - 0: 16
-    - 1: 32
-    - 2: 64
-    - 3: 128
-    - 4: 256
+        - 0: 16
+        - 1: 32
+        - 2: 64
+        - 3: 128
+        - 4: 256
+
+    Wrapper default is 4, plugin default is 1.
     """
 
-    qual: int | None = None
+    qual: int = 2
     """
     The number of different neural network predictions that are blended together to compute the final output value.
     Each neural network was trained on a different set of training data.
     Blending the results of these different networks improves generalisation to unseen data.
     Possible values are 1 and 2.
+
+    Wrapper default is 2, plugin default is 1.
     """
 
-    etype: int | None = None
+    etype: int = 0
     """
     The set of weights used in the predictor neural network. Possible values:
     - 0: Weights trained to minimise absolute error.
     - 1: Weights trained to minimise squared error.
     """
 
-    pscrn: int | None = None
+    pscrn: int | None = 1
     """
     The prescreener used to decide which pixels should be processed by the predictor neural network,
     and which can be handled by simple cubic interpolation.
@@ -250,6 +258,8 @@ class NNEDI3(SuperSampler, Deinterlacer):
     - 4: New prescreener level 2.
 
     The new prescreener is not available with float input.
+
+    Wrapper default is 1, plugin default is 2 for integer input and 1 for float input.
     """
 
     opencl: bool = False

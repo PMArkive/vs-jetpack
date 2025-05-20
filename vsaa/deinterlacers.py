@@ -125,7 +125,7 @@ class Deinterlacer(vs_object, ABC):
 class SuperSampler(Deinterlacer, Scaler, ABC):
     """Abstract base class for supersampling operations."""
 
-    # TODO: Change this when #94 is merged 
+    # TODO: Change this when #94 is merged
     @inject_self.cached
     def scale(
         self,
@@ -170,13 +170,14 @@ class SuperSampler(Deinterlacer, Scaler, ABC):
             while (clip.width if is_width else clip.height) < dim:
                 delta = max(nshift[x], key=lambda y: abs(y))
                 tff = False if delta < 0 else True if delta > 0 else self.tff
+                offset = -0.25 if tff else 0.25
 
+                # TODO: Change this when #94 is merged
                 for y in range(clip.format.num_planes):
                     if not y:
-                        # TODO: Change this when #94 is merged 
-                        nshift[x][y] = (nshift[x][y] + (-0.25 if tff else 0.25)) * 2
+                        nshift[x][y] = (nshift[x][y] + offset) * 2
                     else:
-                        nshift[x][y] = (nshift[x][y] + (-0.25 if tff else 0.25) * subsampling[x]) * 2 - cloc[x]
+                        nshift[x][y] = (nshift[x][y] + offset * subsampling[x]) * 2 - cloc[x]
 
                 if is_width:
                     clip = self.transpose(clip)
@@ -189,7 +190,7 @@ class SuperSampler(Deinterlacer, Scaler, ABC):
         if not self.transpose_first:
             nshift.reverse()
 
-        # TODO: Change this when #94 is merged 
+        # TODO: Change this when #94 is merged
         return clip.fmtc.resample(width, height, nshift[0], nshift[1])
 
 
@@ -272,7 +273,7 @@ class NNEDI3(SuperSampler, Deinterlacer):
         return core.lazy.sneedif.NNEDI3 if self.opencl else core.lazy.znedi3.nnedi3
 
     def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
-        field = int(tff) + (int(self.double_rate) * 2)
+        field = int(tff) + int(self.double_rate) * 2
 
         return self._deinterlacer_function(clip, field, dh, **self.get_deint_args(**kwargs))
 
@@ -285,7 +286,7 @@ class NNEDI3(SuperSampler, Deinterlacer):
             pscrn=self.pscrn
         ) | kwargs
 
-    # TODO: Change this when #94 is merged 
+    # TODO: Change this when #94 is merged
     @inject_self.cached.property
     def kernel_radius(self) -> int:
         match self.nsize:
@@ -404,10 +405,10 @@ class EEDI2(SuperSampler, Deinterlacer):
             pp=self.pp
         ) | kwargs
 
-    # TODO: Change this when #94 is merged 
+    # TODO: Change this when #94 is merged
     @inject_self.cached.property
     def kernel_radius(self) -> int:
-        return fallback(self.maxd, 24)
+        return self.maxd
 
 
 @dataclass
@@ -505,19 +506,6 @@ class EEDI3(SuperSampler, Deinterlacer):
     by limiting edge-directed interpolation to certain pixels.
     """
 
-    opt: int | None = None
-    """
-    Specifies the CPU optimizations to use during processing.
-    The possible values are:
-    - None = Auto-adjust based on whether `mclip` is used.
-    - 0 = Auto-detect the optimal optimization based on the CPU.
-    - 1 = Use standard C implementation.
-    - 2 = Use SSE2.
-    - 3 = Use SSE4.1.
-    - 4 = Use AVX.
-    - 5 = Use AVX512.
-    """
-
     opencl: bool = False
     """Enables the use of the OpenCL variant for processing."""
 
@@ -526,7 +514,8 @@ class EEDI3(SuperSampler, Deinterlacer):
         return core.lazy.eedi3m.EEDI3CL if self.opencl else core.lazy.eedi3m.EEDI3
 
     def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
-        field = int(tff) if dh else int(tff) + (int(self.double_rate) * 2)
+        field = int(tff) if dh else int(tff) + int(self.double_rate) * 2
+        mult = (0 if dh else int(self.double_rate)) + 1
 
         kwargs = self.get_deint_args(**kwargs)
 
@@ -535,8 +524,6 @@ class EEDI3(SuperSampler, Deinterlacer):
 
         if callable(self.mclip):
             kwargs.update(mclip=self.mclip(clip))
-
-        mult = (0 if dh else int(self.double_rate)) + 1
 
         if sclip := kwargs.get('sclip'):
             if sclip.num_frames * 2 == clip.num_frames * mult:
@@ -573,16 +560,16 @@ class EEDI3(SuperSampler, Deinterlacer):
             mclip=self.mclip
         ) | kwargs
 
-        if not self.opencl and kwargs["mclip"] is not None:
+        if not self.opencl and kwargs.get('mclip') is not None:
             # opt=3 appears to always give reliable speed boosts if mclip is used.
-            kwargs.update(opt=fallback(kwargs.pop('opt', None), self.opt, 3))
+            kwargs.update(opt=fallback(kwargs.pop('opt', None), 3))
 
         return kwargs
 
-    # TODO: Change this when #94 is merged 
+    # TODO: Change this when #94 is merged
     @inject_self.cached.property
     def kernel_radius(self) -> int:
-        return fallback(self.mdis, 20)
+        return self.mdis
 
     def __vs_del__(self, core_id: int) -> None:
         self.sclip = None
@@ -590,7 +577,7 @@ class EEDI3(SuperSampler, Deinterlacer):
 
 
 @dataclass
-class SANGNOM(SuperSampler, Deinterlacer):
+class SangNom(SuperSampler, Deinterlacer):
     """SangNom single field deinterlacer using edge-directed interpolation"""
 
     aa: int | Sequence[int] | None = None

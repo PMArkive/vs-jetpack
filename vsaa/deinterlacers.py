@@ -23,23 +23,6 @@ class Deinterlacer(vs_object, ABC):
     double_rate: bool = True
     """Whether to double the FPS."""
 
-    transpose_first: bool = False
-    """Transpose the clip before any operation."""
-
-    class AADirection(IntFlag):
-        """
-        Enum representing the direction(s) in which anti-aliasing should be applied.
-        """
-
-        VERTICAL = auto()
-        """Apply anti-aliasing in the vertical direction."""
-
-        HORIZONTAL = auto()
-        """Apply anti-aliasing in the horizontal direction."""
-
-        BOTH = VERTICAL | HORIZONTAL
-        """Apply anti-aliasing in both horizontal and vertical directions."""
-
     @property
     @abstractmethod
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
@@ -79,6 +62,32 @@ class Deinterlacer(vs_object, ABC):
         """
         return self._interpolate(clip, self.tff, False, **kwargs)
 
+    def copy(self, **kwargs: Any) -> Self:
+        """Returns a new Antialiaser class replacing specified fields with new values"""
+        return replace(self, **kwargs)
+    
+
+@dataclass(kw_only=True)
+class AntiAliaser(Deinterlacer, ABC):
+    """Abstract base class for deinterlacing operations."""
+
+    transpose_first: bool = False
+    """Transpose the clip before any operation."""
+
+    class AADirection(IntFlag):
+        """
+        Enum representing the direction(s) in which anti-aliasing should be applied.
+        """
+
+        VERTICAL = auto()
+        """Apply anti-aliasing in the vertical direction."""
+
+        HORIZONTAL = auto()
+        """Apply anti-aliasing in the horizontal direction."""
+
+        BOTH = VERTICAL | HORIZONTAL
+        """Apply anti-aliasing in both horizontal and vertical directions."""
+
     def antialias(
         self, clip: vs.VideoNode, direction: AADirection = AADirection.BOTH, **kwargs: Any
     ) -> ConstantFormatVideoNode:
@@ -107,7 +116,7 @@ class Deinterlacer(vs_object, ABC):
                     clip = self.transpose(clip)
 
         return clip
-
+    
     def transpose(self, clip: vs.VideoNode) -> ConstantFormatVideoNode:
         """
         Transpose the input clip by swapping its horizontal and vertical axes.
@@ -117,12 +126,8 @@ class Deinterlacer(vs_object, ABC):
         """
         return clip.std.Transpose()
 
-    def copy(self, **kwargs: Any) -> Self:
-        """Returns a new Antialiaser class replacing specified fields with new values"""
-        return replace(self, **kwargs)
 
-
-class SuperSampler(Deinterlacer, Scaler, ABC):
+class SuperSampler(AntiAliaser, Scaler, ABC):
     """Abstract base class for supersampling operations."""
 
     # TODO: Change this when #94 is merged
@@ -195,7 +200,7 @@ class SuperSampler(Deinterlacer, Scaler, ABC):
 
 
 @dataclass
-class NNEDI3(SuperSampler, Deinterlacer):
+class NNEDI3(SuperSampler, AntiAliaser):
     """
     Neural Network Edge Directed Interpolation (3rd gen.)
 
@@ -301,7 +306,7 @@ class NNEDI3(SuperSampler, Deinterlacer):
 
 
 @dataclass
-class EEDI2(SuperSampler, Deinterlacer):
+class EEDI2(SuperSampler, AntiAliaser):
     """Enhanced Edge Directed Interpolation (2nd gen.)"""
 
     mthresh: int = 10
@@ -412,7 +417,7 @@ class EEDI2(SuperSampler, Deinterlacer):
 
 
 @dataclass
-class EEDI3(SuperSampler, Deinterlacer):
+class EEDI3(SuperSampler, AntiAliaser):
     """Enhanced Edge Directed Interpolation (3rd gen.)"""
 
     alpha: float = 0.2
@@ -560,7 +565,7 @@ class EEDI3(SuperSampler, Deinterlacer):
             mclip=self.mclip
         ) | kwargs
 
-        if not self.opencl and kwargs.get('mclip') is not None:
+        if not self.opencl and kwargs.get('mclip'):
             # opt=3 appears to always give reliable speed boosts if mclip is used.
             kwargs.update(opt=fallback(kwargs.pop('opt', None), 3))
 
@@ -577,7 +582,7 @@ class EEDI3(SuperSampler, Deinterlacer):
 
 
 @dataclass
-class SangNom(SuperSampler, Deinterlacer):
+class SangNom(SuperSampler, AntiAliaser):
     """SangNom single field deinterlacer using edge-directed interpolation"""
 
     aa: int | Sequence[int] | None = None
@@ -603,3 +608,31 @@ class SangNom(SuperSampler, Deinterlacer):
         return dict(aa=self.aa) | kwargs
 
     _static_kernel_radius = 3
+
+
+@dataclass
+class BWDIF(Deinterlacer):
+    """Motion adaptive deinterlacing based on yadif with the use of w3fdif and cubic interpolation algorithms."""
+
+    edeint: vs.VideoNode | VSFunctionNoArgs[vs.VideoNode, ConstantFormatVideoNode] | None = None
+    """
+    Allows the specification of an external clip from which to take spatial predictions instead of having Bwdif use cubic interpolation.
+    This clip must be the same width, height, and colorspace as the input clip.
+    If using same rate output, this clip should have the same number of frames as the input.
+    If using double rate output, this clip should have twice as many frames as the input.
+    """
+
+    @property
+    def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
+        return core.lazy.bwdif.Bwdif
+    
+    def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+        field = int(tff) + int(self.double_rate) * 2
+
+        if callable(self.edeint):
+            kwargs.update(edeint=self.edeint(clip))
+
+        return self._deinterlacer_function(clip, field, **self.get_deint_args(**kwargs))
+    
+    def get_deint_args(self, **kwargs: Any) -> dict[str, Any]:
+        return dict(edeint=self.edeint) | kwargs

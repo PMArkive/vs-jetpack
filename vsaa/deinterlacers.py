@@ -303,45 +303,45 @@ class NNEDI3(SuperSampler, Deinterlacer):
 class EEDI2(SuperSampler, Deinterlacer):
     """Enhanced Edge Directed Interpolation (2nd gen.)"""
 
-    mthresh: int | None = None
+    mthresh: int = 10
     """
     Controls the edge magnitude threshold used in edge detection for building the initial edge map.
     Its range is from 0 to 255, with lower values detecting weaker edges.
     """
 
-    lthresh: int | None = None
+    lthresh: int = 20
     """
-    Controls the Laplacian threshold used in edge detection. 
+    Controls the Laplacian threshold used in edge detection.
     Its range is from 0 to 510, with lower values detecting weaker lines.
     """
 
-    vthresh: int | None = None
+    vthresh: int = 20
     """
-    Controls the variance threshold used in edge detection. 
+    Controls the variance threshold used in edge detection.
     Its range is from 0 to a large number, with lower values detecting weaker edges.
     """
 
-    estr: int | None = None
+    estr: int = 2
     """
     Defines the required number of edge pixels (<=) in a 3x3 area, in which the center pixel
     has been detected as an edge pixel, for the center pixel to be removed from the edge map.
     """
-    
-    dstr: int | None = None
+
+    dstr: int = 4
     """
     Defines the required number of edge pixels (>=) in a 3x3 area, in which the center pixel
     has not been detected as an edge pixel, for the center pixel to be added to the edge map.
     """
-    
-    maxd: int | None = None
+
+    maxd: int = 24
     """
     Sets the maximum pixel search distance for determining the interpolation direction.
     Larger values allow the algorithm to connect edges and lines with smaller slopes but may introduce artifacts.
     In some cases, using a smaller `maxd` value can yield better results than a larger one.
     The maximum possible value for `maxd` is 29.
     """
-    
-    map: int | None = None
+
+    map: int = 0
     """
     Allows one of three possible maps to be shown:
     - 0 = no map
@@ -349,8 +349,8 @@ class EEDI2(SuperSampler, Deinterlacer):
     - 2 = original scale direction map
     - 3 = 2x scale direction map
     """
-    
-    nt: int | None = None
+
+    nt: int = 50
     """
     Defines the noise threshold between pixels in the sliding vectors.
     This value is used to determine initial starting conditions.
@@ -358,8 +358,8 @@ class EEDI2(SuperSampler, Deinterlacer):
     while higher values can enhance edge reconstruction at the cost of introducing more artifacts.
     The valid range is from 0 to 256.
     """
-    
-    pp: int | None = None
+
+    pp: int = 1
     """
     Enables two optional post-processing modes designed to reduce artifacts by identifying problem areas
     and applying simple vertical linear interpolation in those areas.
@@ -371,7 +371,7 @@ class EEDI2(SuperSampler, Deinterlacer):
 
     Only `pp=0` and `pp=1` is implemented for the CUDA variant.
     """
-    
+
     cuda: bool = False
     """Enables the use of the CUDA variant for processing."""
 
@@ -414,25 +414,25 @@ class EEDI2(SuperSampler, Deinterlacer):
 class EEDI3(SuperSampler, Deinterlacer):
     """Enhanced Edge Directed Interpolation (3rd gen.)"""
 
-    alpha: float | None = None
+    alpha: float = 0.2
     """
     Controls the weight given to connecting similar neighborhoods.
-    It must be in the range [0, 1]. 
+    It must be in the range [0, 1].
     A larger value for alpha will connect more lines and edges.
     Increasing alpha prioritizes connecting similar regions,
     which can reduce artifacts but may lead to excessive connections.
     """
 
-    beta: float | None = None
+    beta: float = 0.25
     """
     Controls the weight given to the vertical difference created by the interpolation.
     It must also be in the range [0, 1], and the sum of alpha and beta must not exceed 1.
     A larger value for beta will reduce the number of connected lines and edges,
     making the result less directed by edges.
-    At a value of 1.0, there will be no edge-directed interpolation at all. 
+    At a value of 1.0, there will be no edge-directed interpolation at all.
     """
 
-    gamma: float | None = None
+    gamma: float = 20.0
     """
     Penalizes changes in interpolation direction.
     The larger the value of gamma, the smoother the interpolation field will be between two lines.
@@ -443,37 +443,37 @@ class EEDI3(SuperSampler, Deinterlacer):
     If unwanted artifacts occur, reduce alpha and consider increasing beta or gamma.
     """
 
-    nrad: int | None = None
+    nrad: int = 2
     """
-    Sets the radius used for computing neighborhood similarity. The valid range is [0, 3]. 
+    Sets the radius used for computing neighborhood similarity. The valid range is [0, 3].
     A larger value for `nrad` will consider a wider neighborhood for similarity,
     which can improve edge connections but may also increase processing time.
     """
 
-    mdis: int | None = None
+    mdis: int = 20
     """
     Sets the maximum connection radius. The valid range is [1, 40].
     For example, with `mdis=20`, when interpolating the pixel at (50, 10) (x, y),
-    the farthest connections allowed would be between (30, 9)/(70, 11) and (70, 9)/(30, 11). 
+    the farthest connections allowed would be between (30, 9)/(70, 11) and (70, 9)/(30, 11).
     Larger values for `mdis` will allow connecting lines with smaller slopes,
     but this can also increase the chance of artifacts and slow down processing.
     """
 
-    ucubic: bool | None = None
+    ucubic: bool = True
     """
     Determines the type of interpolation used.
     - When `ucubic=True`, cubic 4-point interpolation is applied.
     - When `ucubic=False`, 2-point linear interpolation is used.
     """
 
-    cost3: bool | None = None
+    cost3: bool = True
     """
     Defines the neighborhood cost function used to measure similarity.
     - When `cost3=True`, a 3-neighborhood cost function is used.
     - When `cost3=False`, a 1-neighborhood cost function is applied.
     """
 
-    vcheck: int | None = None
+    vcheck: int = 2
     """
     Defines the reliability check level for the resulting interpolation. The possible values are:
     - 0: No reliability check
@@ -482,7 +482,7 @@ class EEDI3(SuperSampler, Deinterlacer):
     - 3: Strong reliability check
     """
 
-    vthresh: Sequence[float | None] | None = None
+    vthresh: tuple[float | None, float | None, float | None] | None = (32.0, 64.0, 4.0)
     """
     Sequence of three thresholds:
     - vthresh[0]: Used to calculate the reliability for the first difference.
@@ -498,9 +498,9 @@ class EEDI3(SuperSampler, Deinterlacer):
 
     mclip: vs.VideoNode | VSFunctionNoArgs[vs.VideoNode, ConstantFormatVideoNode] | None = None
     """
-    A mask used to apply edge-directed interpolation only to specified pixels. 
+    A mask used to apply edge-directed interpolation only to specified pixels.
     Pixels where the mask value is 0 will be interpolated using cubic linear
-    or bicubic methods instead. 
+    or bicubic methods instead.
     The primary purpose of the mask is to reduce computational overhead
     by limiting edge-directed interpolation to certain pixels.
     """
@@ -554,7 +554,8 @@ class EEDI3(SuperSampler, Deinterlacer):
         return super().transpose(clip)
 
     def get_deint_args(self, **kwargs: Any) -> dict[str, Any]:
-        self.vthresh = normalize_seq(self.vthresh, 3)
+        if self.vthresh is None:
+            self.vthresh = (None, None, None)
 
         kwargs = dict(
             alpha=self.alpha,

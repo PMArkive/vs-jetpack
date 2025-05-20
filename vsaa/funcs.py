@@ -9,7 +9,7 @@ from vsmasktools import EdgeDetect, EdgeDetectT, Prewitt
 from vsrgtools import MeanMode, bilateral, box_blur, gauss_blur, unsharpen
 from vsscale import ArtCNN
 from vstools import (
-    ConstantFormatVideoNode, CustomValueError, FormatsMismatchError, FunctionUtil, KwargsT, PlanesT, VSFunctionNoArgs,
+    ConstantFormatVideoNode, CustomValueError, FormatsMismatchError, FunctionUtil, PlanesT, VSFunctionNoArgs,
     check_variable_format, fallback, get_peak_value, get_y, limiter, scale_mask, vs, ConvMode
 )
 
@@ -232,8 +232,11 @@ def based_aa(
     ss = supersampler.scale(ss_clip, aaw, aah)
 
     if not deinterlacer:
-        deinterlacer = EEDI3(mclip=Bilinear.scale(mask, ss.width, ss.height) if mask else None, sclip=ss)
-        aa_kwargs = KwargsT(alpha=0.125, beta=0.25, vthresh0=12, vthresh1=24) | aa_kwargs
+        deinterlacer = EEDI3(
+            alpha=0.125, beta=0.25, gamma=40, vthresh=(12, 24, None),
+            mclip=Bilinear().scale(mask, ss.width, ss.height) if mask else None,
+            sclip=ss
+        )
 
     aa = deinterlacer.antialias(ss, **aa_kwargs)
 

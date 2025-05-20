@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Callable, ClassVar, Concatenate, Sequence
 
-from vsaa import EEDI3, NNEDI3, SANGNOM
+from vsaa import EEDI3, NNEDI3, SangNom
 from vsexprtools import ExprOp, complexpr_available, norm_expr
 from vskernels import Catrom, Kernel, KernelT, Point, Scaler, ScalerT
 from vsrgtools import box_blur, gauss_blur, limit_filter
@@ -717,7 +717,7 @@ class PAWorksChromaRecon(MissingFieldsChromaRecon):
             demanglers to the original descaled luma or details would just get crushed.
 
     """
-    dm_wscaler: ScalerT = field(default_factory=lambda: SANGNOM(128))
+    dm_wscaler: ScalerT = field(default_factory=lambda: SangNom(128))
     dm_hscaler: ScalerT = NNEDI3
 
     def get_mangled_luma(self, clip: vs.VideoNode, y_base: vs.VideoNode) -> vs.VideoNode:
@@ -762,7 +762,7 @@ class Point422ChromaRecon(MissingFieldsChromaRecon):
     Demangler for content that has undergone from 4:4:4 => 4:2:2 with point, then 4:2:0 with some neutral scaler.
     """
 
-    dm_wscaler: ScalerT = field(default_factory=lambda: SANGNOM(128))
+    dm_wscaler: ScalerT = field(default_factory=lambda: SangNom(128))
     dm_hscaler: ScalerT = field(
         # sclip=NNEDI3() didn't work before and has not been re-implemented either
         default_factory=lambda: EEDI3(0.35, 0.55, 20, 2, 10, vcheck=3, sclip=NNEDI3())  # type: ignore

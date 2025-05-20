@@ -227,7 +227,6 @@ class EEDI3(SuperSampler, Deinterlacer):
     gamma: float | None = None
     nrad: int | None = None
     mdis: int | None = None
-    hp: bool | None = None
     ucubic: bool | None = None
     cost3: bool | None = None
     vcheck: int | None = None
@@ -281,7 +280,6 @@ class EEDI3(SuperSampler, Deinterlacer):
             gamma=self.gamma,
             nrad=self.nrad,
             mdis=self.mdis,
-            hp=self.hp,
             ucubic=self.ucubic,
             cost3=self.cost3,
             vcheck=self.vcheck,

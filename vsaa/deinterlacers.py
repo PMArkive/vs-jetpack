@@ -532,10 +532,6 @@ class EEDI3(SuperSampler, Deinterlacer):
             if sclip.num_frames * 2 == clip.num_frames * mult:
                 kwargs.update(sclip=core.std.Interleave([sclip] * 2))
 
-        if mclip := kwargs.get('mclip'):
-            if mclip.num_frames * 2 == clip.num_frames * mult:
-                kwargs.update(mclip=core.std.Interleave([mclip] * 2))
-
         return self._deinterlacer_function(clip, field, dh, **kwargs)
 
     def transpose(self, clip: vs.VideoNode) -> ConstantFormatVideoNode:

@@ -648,3 +648,6 @@ class BWDIF(Deinterlacer):
 
     def get_deint_args(self, **kwargs: Any) -> dict[str, Any]:
         return dict(edeint=self.edeint) | kwargs
+
+    def __vs_del__(self, core_id: int) -> None:
+        self.edeint = None

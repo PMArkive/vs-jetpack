@@ -495,6 +495,19 @@ class EEDI3(SuperSampler, Deinterlacer):
     by limiting edge-directed interpolation to certain pixels.
     """
 
+    opt: int | None = None
+    """
+    Specifies the CPU optimizations to use during processing.
+    The possible values are:
+    - None = Auto-adjust based on whether `mclip` is used.
+    - 0 = Auto-detect the optimal optimization based on the CPU.
+    - 1 = Use standard C implementation.
+    - 2 = Use SSE2.
+    - 3 = Use SSE4.1.
+    - 4 = Use AVX.
+    - 5 = Use AVX512.
+    """
+
     opencl: bool = False
     """Enables the use of the OpenCL variant for processing."""
 
@@ -537,7 +550,7 @@ class EEDI3(SuperSampler, Deinterlacer):
     def get_deint_args(self, **kwargs: Any) -> dict[str, Any]:
         self.vthresh = normalize_seq(self.vthresh, 3)
 
-        return dict(
+        kwargs = dict(
             alpha=self.alpha,
             beta=self.beta,
             gamma=self.gamma,
@@ -552,6 +565,12 @@ class EEDI3(SuperSampler, Deinterlacer):
             sclip=self.sclip,
             mclip=self.mclip
         ) | kwargs
+
+        if not self.opencl and kwargs["mclip"] is not None:
+            # opt=3 appears to always give reliable speed boosts if mclip is used.
+            kwargs.update(opt=fallback(kwargs.pop('opt', None), self.opt, 3))
+
+        return kwargs
 
     # TODO: Change this when #94 is merged 
     @inject_self.cached.property

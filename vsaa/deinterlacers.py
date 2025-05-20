@@ -8,7 +8,7 @@ from typing_extensions import Self
 
 from vskernels import LeftShift, Scaler, TopShift
 from vstools import (
-    ChromaLocation, ConstantFormatVideoNode, VSFunctionAllArgs, VSFunctionNoArgs, check_variable, core, fallback,
+    ChromaLocation, ConstantFormatVideoNode, VSFunctionAllArgs, VSFunctionNoArgs, check_variable, core,
     normalize_seq, vs, vs_object
 )
 
@@ -65,7 +65,7 @@ class Deinterlacer(vs_object, ABC):
     def copy(self, **kwargs: Any) -> Self:
         """Returns a new Antialiaser class replacing specified fields with new values"""
         return replace(self, **kwargs)
-    
+
 
 @dataclass(kw_only=True)
 class AntiAliaser(Deinterlacer, ABC):
@@ -116,7 +116,7 @@ class AntiAliaser(Deinterlacer, ABC):
                     clip = self.transpose(clip)
 
         return clip
-    
+
     def transpose(self, clip: vs.VideoNode) -> ConstantFormatVideoNode:
         """
         Transpose the input clip by swapping its horizontal and vertical axes.
@@ -565,9 +565,9 @@ class EEDI3(SuperSampler, AntiAliaser):
             mclip=self.mclip
         ) | kwargs
 
-        if not self.opencl and kwargs.get('mclip'):
+        if not self.opencl and kwargs["mclip"] is not None and kwargs.get("opt") is None:
             # opt=3 appears to always give reliable speed boosts if mclip is used.
-            kwargs.update(opt=fallback(kwargs.pop('opt', None), 3))
+            kwargs["opt"] = 3
 
         return kwargs
 
@@ -625,7 +625,7 @@ class BWDIF(Deinterlacer):
     @property
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.bwdif.Bwdif
-    
+
     def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
         field = int(tff) + int(self.double_rate) * 2
 
@@ -633,6 +633,6 @@ class BWDIF(Deinterlacer):
             kwargs.update(edeint=self.edeint(clip))
 
         return self._deinterlacer_function(clip, field, **self.get_deint_args(**kwargs))
-    
+
     def get_deint_args(self, **kwargs: Any) -> dict[str, Any]:
         return dict(edeint=self.edeint) | kwargs

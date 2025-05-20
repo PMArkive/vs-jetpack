@@ -13,7 +13,7 @@ from vstools import (
     check_variable_format, fallback, get_peak_value, get_y, limiter, scale_mask, vs, ConvMode
 )
 
-from .deinterlacers import Deinterlacer, NNEDI3, EEDI3
+from .deinterlacers import AntiAliaser, NNEDI3, EEDI3
 
 __all__ = [
     'pre_aa',
@@ -27,25 +27,25 @@ def pre_aa(
     sharpener: VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] = partial(
         unsharpen, blur=partial(gauss_blur, mode=ConvMode.VERTICAL, sigma=1)
     ),
-    deinterlacer: Deinterlacer = NNEDI3(),
-    direction: Deinterlacer.AADirection = Deinterlacer.AADirection.BOTH,
+    antialiaser: AntiAliaser = NNEDI3(),
+    direction: AntiAliaser.AADirection = AntiAliaser.AADirection.BOTH,
     planes: PlanesT = None,
 ) -> vs.VideoNode:
     func = FunctionUtil(clip, pre_aa, planes)
 
     wclip = func.work_clip
 
-    for x in Deinterlacer.AADirection:
-        if direction in (x, Deinterlacer.AADirection.BOTH):
-            if x == Deinterlacer.AADirection.HORIZONTAL:
-                wclip = deinterlacer.transpose(wclip)
+    for x in AntiAliaser.AADirection:
+        if direction in (x, AntiAliaser.AADirection.BOTH):
+            if x == AntiAliaser.AADirection.HORIZONTAL:
+                wclip = antialiaser.transpose(wclip)
 
-            aa = deinterlacer.antialias(wclip, Deinterlacer.AADirection.VERTICAL)
+            aa = antialiaser.antialias(wclip, AntiAliaser.AADirection.VERTICAL)
             sharp = sharpener(wclip)
             limit = MeanMode.MEDIAN(wclip, aa, sharp)
 
-            if x == Deinterlacer.AADirection.HORIZONTAL:
-                wclip = deinterlacer.transpose(limit)
+            if x == AntiAliaser.AADirection.HORIZONTAL:
+                wclip = antialiaser.transpose(limit)
 
     return func.return_clip(wclip)
 
@@ -55,8 +55,8 @@ def clamp_aa(
     strength: float = 1.0,
     mthr: float = 0.25,
     mask: vs.VideoNode | EdgeDetectT | Literal[False] = False,
-    weak_aa: vs.VideoNode | Deinterlacer | None = None,
-    strong_aa: vs.VideoNode | Deinterlacer | None = None,
+    weak_aa: vs.VideoNode | AntiAliaser | None = None,
+    strong_aa: vs.VideoNode | AntiAliaser | None = None,
     ref: vs.VideoNode | None = None,
     planes: PlanesT = 0
 ) -> ConstantFormatVideoNode:
@@ -67,8 +67,8 @@ def clamp_aa(
     :param strength:            Set threshold strength for over/underflow value for clamping.
     :param mthr:                Binarize threshold for the mask, float.
     :param mask:                Clip to use for custom mask or an EdgeDetect to use custom masker.
-    :param weak_aa:             Deinterlacer for the weaker aa. Default is Nnedi3
-    :param strong_aa:           Deinterlacer for the stronger aa. Default is Eedi3
+    :param weak_aa:             AntiAliaser for the weaker aa. Default is Nnedi3
+    :param strong_aa:           AntiAliaser for the stronger aa. Default is Eedi3
     :param ref:                 Reference clip for clamping.
 
     :return:                    Antialiased clip.
@@ -127,7 +127,7 @@ def based_aa(
     pscale: float = 0.0,
     downscaler: ScalerT | None = None,
     supersampler: ScalerT | Literal[False] = ArtCNN,
-    deinterlacer: Deinterlacer | None = None,
+    antialiaser: AntiAliaser | None = None,
     prefilter: vs.VideoNode | VSFunctionNoArgs[vs.VideoNode, ConstantFormatVideoNode] | Literal[False] = False,
     postfilter: VSFunctionNoArgs[vs.VideoNode, ConstantFormatVideoNode] | Literal[False] | None = None,
     show_mask: bool = False, **aa_kwargs: Any
@@ -135,9 +135,9 @@ def based_aa(
     """
     Perform based anti-aliasing on a video clip.
 
-    This function works by super- or downsampling the clip and applying an Deinterlacer to that image.
+    This function works by super- or downsampling the clip and applying an AntiAliaser to that image.
     The result is then merged with the original clip using an edge mask, and it's limited
-    to areas where the Deinterlacer was actually applied.
+    to areas where the AntiAliaser was actually applied.
 
     Sharp supersamplers will yield better results, so long as they do not introduce too much ringing.
     For downscalers, you will want to use a neutral kernel.
@@ -231,14 +231,14 @@ def based_aa(
 
     ss = supersampler.scale(ss_clip, aaw, aah)
 
-    if not deinterlacer:
-        deinterlacer = EEDI3(
+    if not antialiaser:
+        antialiaser = EEDI3(
             alpha=0.125, beta=0.25, gamma=40, vthresh=(12, 24, None),
             mclip=Bilinear().scale(mask, ss.width, ss.height) if mask else None,
             sclip=ss
         )
 
-    aa = deinterlacer.antialias(ss, **aa_kwargs)
+    aa = antialiaser.antialias(ss, **aa_kwargs)
 
     aa = downscaler.scale(aa, func.work_clip.width, func.work_clip.height)  # type: ignore
 

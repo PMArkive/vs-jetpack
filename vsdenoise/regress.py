@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Callable, ClassVar, Concatenate, Sequence
 
-from vsaa import Eedi3, Nnedi3, SangNom
+from vsaa import EEDI3, NNEDI3, SANGNOM
 from vsexprtools import ExprOp, complexpr_available, norm_expr
 from vskernels import Catrom, Kernel, KernelT, Point, Scaler, ScalerT
 from vsrgtools import box_blur, gauss_blur, limit_filter
@@ -676,10 +676,10 @@ class MissingFieldsChromaRecon(GenericChromaRecon):
     Base helper function for reconstructing chroma with missing fields.
     """
 
-    dm_wscaler: ScalerT = Nnedi3
+    dm_wscaler: ScalerT = NNEDI3
     """Scaler used to interpolate the width/height."""
 
-    dm_hscaler: ScalerT | None = Nnedi3
+    dm_hscaler: ScalerT | None = NNEDI3
     """Scaler used to interpolate the height."""
 
     def __post_init__(self) -> None:
@@ -717,8 +717,8 @@ class PAWorksChromaRecon(MissingFieldsChromaRecon):
             demanglers to the original descaled luma or details would just get crushed.
 
     """
-    dm_wscaler: ScalerT = field(default_factory=lambda: SangNom(128))
-    dm_hscaler: ScalerT = Nnedi3
+    dm_wscaler: ScalerT = field(default_factory=lambda: SANGNOM(128))
+    dm_hscaler: ScalerT = NNEDI3
 
     def get_mangled_luma(self, clip: vs.VideoNode, y_base: vs.VideoNode) -> vs.VideoNode:
         cm_width, _ = get_plane_sizes(y_base, 1)
@@ -762,9 +762,10 @@ class Point422ChromaRecon(MissingFieldsChromaRecon):
     Demangler for content that has undergone from 4:4:4 => 4:2:2 with point, then 4:2:0 with some neutral scaler.
     """
 
-    dm_wscaler: ScalerT = field(default_factory=lambda: SangNom(128))
+    dm_wscaler: ScalerT = field(default_factory=lambda: SANGNOM(128))
     dm_hscaler: ScalerT = field(
-        default_factory=lambda: Eedi3(0.35, 0.55, 20, 2, 10, vcheck=3, sclip_aa=Nnedi3)
+        # sclip=NNEDI3() didn't work before and has not been re-implemented either
+        default_factory=lambda: EEDI3(0.35, 0.55, 20, 2, 10, vcheck=3, sclip=NNEDI3())  # type: ignore
     )
 
     def demangle_chroma(self, mangled: vs.VideoNode, y_base: vs.VideoNode) -> vs.VideoNode:

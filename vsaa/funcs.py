@@ -67,8 +67,8 @@ def clamp_aa(
     :param strength:            Set threshold strength for over/underflow value for clamping.
     :param mthr:                Binarize threshold for the mask, float.
     :param mask:                Clip to use for custom mask or an EdgeDetect to use custom masker.
-    :param weak_aa:             AntiAliaser for the weaker aa. Default is Nnedi3
-    :param strong_aa:           AntiAliaser for the stronger aa. Default is Eedi3
+    :param weak_aa:             AntiAliaser for the weaker aa. Default is NNEDI3.
+    :param strong_aa:           AntiAliaser for the stronger aa. Default is EEDI3.
     :param ref:                 Reference clip for clamping.
 
     :return:                    Antialiased clip.

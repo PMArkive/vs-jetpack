@@ -15,36 +15,82 @@ from vstools import (
 
 @dataclass(kw_only=True)
 class Deinterlacer(vs_object, ABC):
+    """Abstract base class for deinterlacing operations."""
+
     tff: bool = False
+    """The field order."""
+
     double_rate: bool = True
+    """Whether to double the FPS."""
+
     transpose_first: bool = False
+    """Transpose the clip before any operation."""
+
     class AADirection(IntFlag):
+        """
+        Enum representing the direction(s) in which anti-aliasing should be applied.
+        """
+
         VERTICAL = auto()
+        """Apply anti-aliasing in the vertical direction."""
+
         HORIZONTAL = auto()
+        """Apply anti-aliasing in the horizontal direction."""
+
         BOTH = VERTICAL | HORIZONTAL
+        """Apply anti-aliasing in both horizontal and vertical directions."""
 
     @property
     @abstractmethod
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
-        """Get the plugin function"""
+        """Get the plugin function."""
 
     @abstractmethod
     def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
         """
         Performs deinterlacing if dh is False or doubling if dh is True.
-        Should handle tff to field if needed and should add the kwargs from `get_deint_args`
+
+        Subclasses should handle tff to field if needed and add the kwargs from `get_deint_args`
+
+        :param clip:    The input clip.
+        :param tff:     The field order of the input clip.
+        :param dh:      If True, doubles the height of the input by copying each line to every other line of the output,
+                        with the missing lines interpolated.
+        :return:        Interpolated clip.
         """
 
     @abstractmethod
     def get_deint_args(self, **kwargs: Any) -> dict[str, Any]:
+        """
+        Retrieves arguments for deinterlacing processing.
+
+        :param kwargs:  Additional arguments.
+        :return:        Passed keyword arguments.
+        """
         return kwargs
 
     def deinterlace(self, clip: vs.VideoNode, **kwargs: Any) -> ConstantFormatVideoNode:
+        """
+        Apply deinterlacing to the given clip.
+
+        :param clip:    The input clip.
+        :param kwargs:  Additional arguments passed to the plugin function.
+        :return:        Deinterlaced clip.
+        """
         return self._interpolate(clip, self.tff, False, **kwargs)
 
     def antialias(
         self, clip: vs.VideoNode, direction: AADirection = AADirection.BOTH, **kwargs: Any
     ) -> ConstantFormatVideoNode:
+        """
+        Apply anti-aliasing to the given clip.
+
+        :param clip:        The input clip.
+        :param direction:   Direction in which to apply anti-aliasing.
+                            Defaults to AADirection.BOTH.
+        :param kwargs:      Additional arguments passed to the plugin function.
+        :return:            Anti-aliased clip.
+        """
         assert check_variable(clip, self.antialias)
 
         for y in sorted((aa_dir for aa_dir in self.AADirection), key=lambda x: x.value, reverse=self.transpose_first):
@@ -63,6 +109,12 @@ class Deinterlacer(vs_object, ABC):
         return clip
 
     def transpose(self, clip: vs.VideoNode) -> ConstantFormatVideoNode:
+        """
+        Transpose the input clip by swapping its horizontal and vertical axes.
+
+        :param clip:    The input clip.
+        :return:        The transposed clip.
+        """
         return clip.std.Transpose()
 
     def copy(self, **kwargs: Any) -> Self:
@@ -71,6 +123,8 @@ class Deinterlacer(vs_object, ABC):
 
 
 class SuperSampler(Deinterlacer, Scaler, ABC):
+    """Abstract base class for supersampling operations."""
+
     # TODO: Change this when #94 is merged 
     @inject_self.cached
     def scale(
@@ -81,6 +135,16 @@ class SuperSampler(Deinterlacer, Scaler, ABC):
         shift: tuple[TopShift, LeftShift] = (0, 0),
         **kwargs: Any
     ) -> ConstantFormatVideoNode:
+        """
+        Scale the given clip using super sampling method.
+
+        :param clip:        The source clip.
+        :param width:       Target width (defaults to clip width if None).
+        :param height:      Target height (defaults to clip height if None).
+        :param shift:       Subpixel shift (top, left) applied during scaling.
+        :param kwargs:      Additional arguments forwarded to the deinterlacing function.
+        :return:            The scaled clip.
+        """
         assert check_variable(clip, self.scale)
 
         dest_dimensions = list(self._wh_norm(clip, width, height))
@@ -131,12 +195,67 @@ class SuperSampler(Deinterlacer, Scaler, ABC):
 
 @dataclass
 class NNEDI3(SuperSampler, Deinterlacer):
+    """
+    Neural Network Edge Directed Interpolation (3rd gen.)
+    """
+
     nsize: int | None = None
+    """
+    Size of the local neighbourhood around each pixel used by the predictor neural network.
+    Possible settings:
+    - 0: 8x6
+    - 1: 16x6
+    - 2: 32x6
+    - 3: 48x6
+    - 4: 8x4
+    - 5: 16x4
+    - 6: 32x4
+    """
+
     nns: int | None = None
+    """
+    Number of neurons in the predictor neural network. Possible values:
+    - 0: 16
+    - 1: 32
+    - 2: 64
+    - 3: 128
+    - 4: 256
+    """
+
     qual: int | None = None
+    """
+    The number of different neural network predictions that are blended together to compute the final output value.
+    Each neural network was trained on a different set of training data.
+    Blending the results of these different networks improves generalisation to unseen data.
+    Possible values are 1 and 2.
+    """
+
     etype: int | None = None
+    """
+    The set of weights used in the predictor neural network. Possible values:
+    - 0: Weights trained to minimise absolute error.
+    - 1: Weights trained to minimise squared error.
+    """
+
     pscrn: int | None = None
+    """
+    The prescreener used to decide which pixels should be processed by the predictor neural network,
+    and which can be handled by simple cubic interpolation.
+    Since most pixels can be handled by cubic interpolation, using the prescreener
+    generally results in much faster processing. Possible values:
+    - 0: No prescreening. No pixels will be processed with cubic interpolation. This is really slow.
+    - 1: Old prescreener.
+    - 2: New prescreener level 0.
+    - 3: New prescreener level 1.
+    - 4: New prescreener level 2.
+
+    The new prescreener is not available with float input.
+    """
+
     opencl: bool = False
+    """
+    Enables the use of the OpenCL variant.
+    """
 
     @property
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
@@ -172,16 +291,79 @@ class NNEDI3(SuperSampler, Deinterlacer):
 
 @dataclass
 class EEDI2(SuperSampler, Deinterlacer):
+    """Enhanced Edge Directed Interpolation (2nd gen.)"""
+
     mthresh: int | None = None
+    """
+    Controls the edge magnitude threshold used in edge detection for building the initial edge map.
+    Its range is from 0 to 255, with lower values detecting weaker edges.
+    """
+
     lthresh: int | None = None
+    """
+    Controls the Laplacian threshold used in edge detection. 
+    Its range is from 0 to 510, with lower values detecting weaker lines.
+    """
+
     vthresh: int | None = None
+    """
+    Controls the variance threshold used in edge detection. 
+    Its range is from 0 to a large number, with lower values detecting weaker edges.
+    """
+
     estr: int | None = None
+    """
+    Defines the required number of edge pixels (<=) in a 3x3 area, in which the center pixel
+    has been detected as an edge pixel, for the center pixel to be removed from the edge map.
+    """
+    
     dstr: int | None = None
+    """
+    Defines the required number of edge pixels (>=) in a 3x3 area, in which the center pixel
+    has not been detected as an edge pixel, for the center pixel to be added to the edge map.
+    """
+    
     maxd: int | None = None
+    """
+    Sets the maximum pixel search distance for determining the interpolation direction.
+    Larger values allow the algorithm to connect edges and lines with smaller slopes but may introduce artifacts.
+    In some cases, using a smaller `maxd` value can yield better results than a larger one.
+    The maximum possible value for `maxd` is 29.
+    """
+    
     map: int | None = None
+    """
+    Allows one of three possible maps to be shown:
+    - 0 = no map
+    - 1 = edge map (Edge pixels will be set to 255 and non-edge pixels will be set to 0)
+    - 2 = original scale direction map
+    - 3 = 2x scale direction map
+    """
+    
     nt: int | None = None
+    """
+    Defines the noise threshold between pixels in the sliding vectors.
+    This value is used to determine initial starting conditions.
+    Lower values typically reduce artifacts but may degrade edge reconstruction,
+    while higher values can enhance edge reconstruction at the cost of introducing more artifacts.
+    The valid range is from 0 to 256.
+    """
+    
     pp: int | None = None
+    """
+    Enables two optional post-processing modes designed to reduce artifacts by identifying problem areas
+    and applying simple vertical linear interpolation in those areas.
+    While these modes can improve results, they may slow down processing and slightly reduce edge sharpness.
+    - 0 = No post-processing
+    - 1 = Check for spatial consistency of final interpolation directions
+    - 2 = Check for junctions and corners
+    - 3 = Apply both checks from 1 and 2
+
+    Only `pp=0` and `pp=1` is implemented for the CUDA variant.
+    """
+    
     cuda: bool = False
+    """Enables the use of the CUDA variant for processing."""
 
     @property
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
@@ -220,18 +402,101 @@ class EEDI2(SuperSampler, Deinterlacer):
 
 @dataclass
 class EEDI3(SuperSampler, Deinterlacer):
+    """Enhanced Edge Directed Interpolation (3rd gen.)"""
+
     alpha: float | None = None
+    """
+    Controls the weight given to connecting similar neighborhoods.
+    It must be in the range [0, 1]. 
+    A larger value for alpha will connect more lines and edges.
+    Increasing alpha prioritizes connecting similar regions,
+    which can reduce artifacts but may lead to excessive connections.
+    """
+
     beta: float | None = None
+    """
+    Controls the weight given to the vertical difference created by the interpolation.
+    It must also be in the range [0, 1], and the sum of alpha and beta must not exceed 1.
+    A larger value for beta will reduce the number of connected lines and edges,
+    making the result less directed by edges.
+    At a value of 1.0, there will be no edge-directed interpolation at all. 
+    """
+
     gamma: float | None = None
+    """
+    Penalizes changes in interpolation direction.
+    The larger the value of gamma, the smoother the interpolation field will be between two lines.
+    The range for gamma is [0, ∞].
+    Increasing gamma results in a smoother interpolation between lines but may reduce the sharpness of edges.
+
+    If lines are not connecting properly, try increasing alpha and possibly decreasing beta/gamma.
+    If unwanted artifacts occur, reduce alpha and consider increasing beta or gamma.
+    """
+
     nrad: int | None = None
+    """
+    Sets the radius used for computing neighborhood similarity. The valid range is [0, 3]. 
+    A larger value for `nrad` will consider a wider neighborhood for similarity,
+    which can improve edge connections but may also increase processing time.
+    """
+
     mdis: int | None = None
+    """
+    Sets the maximum connection radius. The valid range is [1, 40].
+    For example, with `mdis=20`, when interpolating the pixel at (50, 10) (x, y),
+    the farthest connections allowed would be between (30, 9)/(70, 11) and (70, 9)/(30, 11). 
+    Larger values for `mdis` will allow connecting lines with smaller slopes,
+    but this can also increase the chance of artifacts and slow down processing.
+    """
+
     ucubic: bool | None = None
+    """
+    Determines the type of interpolation used.
+    - When `ucubic=True`, cubic 4-point interpolation is applied.
+    - When `ucubic=False`, 2-point linear interpolation is used.
+    """
+
     cost3: bool | None = None
+    """
+    Defines the neighborhood cost function used to measure similarity.
+    - When `cost3=True`, a 3-neighborhood cost function is used.
+    - When `cost3=False`, a 1-neighborhood cost function is applied.
+    """
+
     vcheck: int | None = None
+    """
+    Defines the reliability check level for the resulting interpolation. The possible values are:
+    - 0: No reliability check
+    - 1: Weak reliability check
+    - 2: Medium reliability check
+    - 3: Strong reliability check
+    """
+
     vthresh: Sequence[float | None] | None = None
+    """
+    Sequence of three thresholds:
+    - vthresh[0]: Used to calculate the reliability for the first difference.
+    - vthresh[1]: Used for the second difference.
+    - vthresh[2]: Controls the weighting of the interpolation direction.
+    """
+
     sclip: vs.VideoNode | VSFunctionNoArgs[vs.VideoNode, ConstantFormatVideoNode] | None = None
+    """
+    Provides additional control over the interpolation by using a reference clip.
+    If set to None, vertical cubic interpolation is used as a fallback method instead.
+    """
+
     mclip: vs.VideoNode | VSFunctionNoArgs[vs.VideoNode, ConstantFormatVideoNode] | None = None
+    """
+    A mask used to apply edge-directed interpolation only to specified pixels. 
+    Pixels where the mask value is 0 will be interpolated using cubic linear
+    or bicubic methods instead. 
+    The primary purpose of the mask is to reduce computational overhead
+    by limiting edge-directed interpolation to certain pixels.
+    """
+
     opencl: bool = False
+    """Enables the use of the OpenCL variant for processing."""
 
     @property
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
@@ -300,7 +565,13 @@ class EEDI3(SuperSampler, Deinterlacer):
 
 @dataclass
 class SANGNOM(SuperSampler, Deinterlacer):
+    """SangNom single field deinterlacer using edge-directed interpolation"""
+
     aa: int | Sequence[int] | None = None
+    """
+    The strength of luma anti-aliasing, applied to an 8-bit clip.
+    Must be an integer between 0 and 128, inclusive.
+    """
 
     @property
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:

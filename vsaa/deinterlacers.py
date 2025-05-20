@@ -279,14 +279,14 @@ class NNEDI3(SuperSampler, Deinterlacer):
     @inject_self.cached.property
     def kernel_radius(self) -> int:
         match self.nsize:
+            case 0 | 4:
+                return 8
             case 1 | 5:
                 return 16
-            case 2 | 6:
-                return 32
             case 3:
                 return 48
             case _:
-                return 8
+                return 32
 
 
 @dataclass

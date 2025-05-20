@@ -12,6 +12,18 @@ from vstools import (
     normalize_seq, vs, vs_object
 )
 
+__all__ = [
+    "Deinterlacer",
+    "AntiAliaser",
+    "SuperSampler",
+
+    "NNEDI3",
+    "EEDI2",
+    "EEDI3",
+    "SangNom",
+    "BWDIF"
+]
+
 
 @dataclass(kw_only=True)
 class Deinterlacer(vs_object, ABC):

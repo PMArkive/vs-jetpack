@@ -4,7 +4,7 @@ from typing import Any, Sequence, SupportsFloat, cast
 
 from jetpytools import CustomNotImplementedError, CustomRuntimeError, CustomStrEnum
 
-from vsaa import NNEDI3
+from vsaa import NNEDI3, BWDIF
 from vsexprtools import norm_expr
 from vsmasktools import FDoG, GenericMaskT, Morpho, adg_mask, normalize_mask, strength_zones_mask
 from vsrgtools import MeanMode, gauss_blur, repair
@@ -264,7 +264,7 @@ def mpeg2stinx(
         return norm_expr([flt, src, diff], 'z {limit} * LIM! x y LIM@ - y LIM@ + clip', limit=limit, func=mpeg2stinx)
 
     def _default_bob(clip: vs.VideoNode) -> vs.VideoNode:
-        return clip.bwdif.Bwdif(field=3, edeint=NNEDI3(tff=True).deinterlace(clip))
+        return BWDIF(tff=True, edeint=NNEDI3(tff=True).deinterlace(clip)).deinterlace(clip)
     
     assert check_progressive(clip, mpeg2stinx)
 

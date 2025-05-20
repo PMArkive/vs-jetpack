@@ -302,7 +302,7 @@ class EEDI3(SuperSampler, Deinterlacer):
 
 @dataclass
 class SANGNOM(SuperSampler, Deinterlacer):
-    aa: Sequence[int | None] | None = None
+    aa: int | Sequence[int] | None = None
 
     @property
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:

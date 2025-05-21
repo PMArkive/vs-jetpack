@@ -7,7 +7,7 @@ from typing_extensions import Self
 
 from vskernels import Catrom, LeftShift, Scaler, TopShift, ComplexScalerLike, ComplexScaler
 from vstools import (
-    ChromaLocation, ConstantFormatVideoNode, VSFunctionAllArgs, VSFunctionNoArgs, check_variable, core,
+    ChromaLocation, ConstantFormatVideoNode, VSFunctionAllArgs, VSFunctionNoArgs, VideoNodeT, check_variable, core,
     normalize_seq, vs, vs_object
 )
 
@@ -155,6 +155,8 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
         """
         Scale the given clip using super sampling method.
 
+        Note: Setting `tff=True` results in less chroma shift for non-centered chroma locations.
+
         :param clip:        The source clip.
         :param width:       Target width (defaults to clip width if None).
         :param height:      Target height (defaults to clip height if None).
@@ -209,6 +211,23 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
         return ComplexScaler.ensure_obj(self.scaler, self.__class__).scale(  # type: ignore[return-value]
             clip, width, height, (nshift[1], nshift[0])
         )
+
+    def supersample(
+        self, clip: VideoNodeT, rfactor: float = 2.0, shift: tuple[TopShift, LeftShift] = (0, 0), **kwargs: Any
+    ) -> VideoNodeT:
+        """
+        Supersample a clip by a given scaling factor.
+
+        Note: Setting `tff=True` results in less chroma shift for non-centered chroma locations.
+
+        :param clip:                The source clip.
+        :param rfactor:             Scaling factor for supersampling.
+        :param shift:               Subpixel shift (top, left) applied during scaling.
+        :param kwargs:              Additional arguments forwarded to the scale function.
+        :raises CustomValueError:   If resulting resolution is non-positive.
+        :return:                    The supersampled clip.
+        """
+        return super().supersample(clip, rfactor, shift, **kwargs)
 
 
 @dataclass

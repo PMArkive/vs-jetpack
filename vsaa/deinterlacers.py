@@ -143,6 +143,15 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
     """Abstract base class for supersampling operations."""
 
     scaler: ComplexScalerLike = Catrom
+    """Scaler used for downscaling and shifting after supersampling."""
+
+    noshift: bool | Sequence[bool] = False
+    """
+    Disables sub-pixel shifting after supersampling.
+
+    - `bool`: Applies to both luma and chroma.
+    - `Sequence[bool]`: First for luma, second for chroma.
+    """
 
     def scale(
         self,
@@ -207,6 +216,13 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
 
         if not self.transpose_first:
             nshift.reverse()
+
+        if self.noshift:
+            noshift = normalize_seq(self.noshift, clip.format.num_planes)
+
+            for ns in nshift:
+                for i in range(len(ns)):
+                    ns[i] *= not noshift[i]
 
         return ComplexScaler.ensure_obj(self.scaler, self.__class__).scale(  # type: ignore[return-value]
             clip, width, height, (nshift[1], nshift[0])

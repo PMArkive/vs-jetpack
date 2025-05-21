@@ -38,7 +38,7 @@ def base_dehalo_mask(
     luma = get_y(src)
 
     if pre_ss:
-        luma = NNEDI3().supersample(luma)  # type:ignore
+        luma = NNEDI3().supersample(luma)
 
     exp_edges = norm_expr(
         [luma, Morpho.maximum(luma, iterations=2)], 'y x - {shift} - range_half *',

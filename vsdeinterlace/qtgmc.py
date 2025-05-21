@@ -307,7 +307,7 @@ class QTempGaussMC(vs_object):
         *,
         tr: int = 2,
         thsad: int | tuple[int, int] = 640,
-        bobber: Deinterlacer = NNEDI3(nsize=1, nns=4, qual=2, pscrn=1),
+        bobber: Deinterlacer = NNEDI3(nsize=1),
         noise_restore: float = 0.0,
         degrain_args: KwargsT | None = None,
         mask_args: KwargsT | None | Literal[False] = None,

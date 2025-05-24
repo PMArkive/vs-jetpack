@@ -67,7 +67,7 @@ def frequency_merge(
     - Lehmer merging 34 sources (stop doing that please)
 
     ``` py
-        merged = frequency_merge(*clips, lowpass=lambda clip: DFTTest.denoise(clip, ...))
+        merged = frequency_merge(*clips, lowpass=lambda clip: DFTTest().denoise(clip, ...))
     ```
 
     :param _clips:      A variable number of tuples, each containing a clip and an optional lowpass filter function.

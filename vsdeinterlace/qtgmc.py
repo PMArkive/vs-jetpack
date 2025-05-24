@@ -6,6 +6,7 @@ from jetpytools import CustomIntEnum
 from numpy import linalg, zeros
 from typing_extensions import Self
 
+from vskernels import Catrom
 from vsaa import Deinterlacer, NNEDI3
 from vsdeband import AddNoise
 from vsdenoise import (
@@ -16,7 +17,7 @@ from vsmasktools import Coordinates, Morpho
 from vsrgtools import BlurMatrix, gauss_blur, median_blur, remove_grain, repair, unsharpen
 from vstools import (
     ConstantFormatVideoNode, ConvMode, CustomRuntimeError, FieldBased, FieldBasedT, KwargsT, VSFunctionKwArgs,
-    check_variable, core, fallback, normalize_seq, scale_delta, vs, vs_object
+    check_variable, core, fallback, normalize_seq, scale_delta, sc_detect, vs, vs_object
 )
 
 from .utils import reinterlace, reweave
@@ -97,7 +98,6 @@ class QTempGaussMC(vs_object):
         REPAIR = 2
         """Repair badly deinterlaced material with considerable horizontal artefacts."""
 
-
     class SearchPostProcess(CustomIntEnum):
         """Prefiltering to apply in order to assist with motion search."""
 
@@ -109,7 +109,6 @@ class QTempGaussMC(vs_object):
 
         GAUSSBLUR_EDGESOFTEN = 2
         """Gaussian blur & edge softening."""
-
 
     class NoiseProcessMode(CustomIntEnum):
         """How to handle processing noise in the source."""
@@ -123,7 +122,6 @@ class QTempGaussMC(vs_object):
         IDENTIFY = 2
         """Identify noise only & optionally restore some noise back at the end of basic or final stages."""
 
-
     class NoiseDeintMode(CustomIntEnum):
         """When noise is taken from interlaced source, how to 'deinterlace' it before restoring."""
 
@@ -134,8 +132,7 @@ class QTempGaussMC(vs_object):
         """Bob source noise, results in coarse noise."""
 
         GENERATE = 2
-        """Gnerates fresh noise lines."""
-
+        """Generates fresh noise lines."""
 
     class SharpMode(CustomIntEnum):
         """How to re-sharpen the clip after temporally blurring."""
@@ -148,7 +145,6 @@ class QTempGaussMC(vs_object):
 
         UNSHARP_MINMAX = 2
         """Re-sharpening using unsharpening clamped to the local 3x3 min/max average."""
-
 
     class SharpLimitMode(CustomIntEnum):
         """How to limit and when to apply re-sharpening of the clip."""
@@ -168,7 +164,6 @@ class QTempGaussMC(vs_object):
         TEMPORAL_POSTSMOOTH = 4
         """Temporal sharpness limiting after the final stage."""
 
-
     class BackBlendMode(CustomIntEnum):
         """When to back blend (blurred) difference between pre & post sharpened clip."""
 
@@ -184,7 +179,6 @@ class QTempGaussMC(vs_object):
         BOTH = 3
         """Perform back-blending both before and after sharpness limiting."""
 
-
     class SourceMatchMode(CustomIntEnum):
         """Creates higher fidelity output with extra processing. will capture more source detail and reduce oversharpening / haloing."""
 
@@ -199,7 +193,6 @@ class QTempGaussMC(vs_object):
 
         TWICE_REFINED = 3
         """Restores almost exact source detail."""
-
 
     class LosslessMode(CustomIntEnum):
         """When to put exact source fields into result & clean any artefacts."""
@@ -240,7 +233,7 @@ class QTempGaussMC(vs_object):
         self,
         *,
         tr: int = 2,
-        sc_threshold: float | None | Literal[False] = None,
+        sc_threshold: float | Literal[False] = 0.1,
         postprocess: SearchPostProcess = SearchPostProcess.GAUSSBLUR_EDGESOFTEN,
         strength: tuple[float, float] = (1.9, 0.1),
         limit: tuple[int | float, int | float, int | float] = (3, 7, 2),
@@ -273,7 +266,7 @@ class QTempGaussMC(vs_object):
         self,
         *,
         tr: int = 2,
-        func: _DenoiseFuncTr | VSFunctionKwArgs[vs.VideoNode, vs.VideoNode] = partial(DFTTest.denoise, sigma=8),
+        func: _DenoiseFuncTr | VSFunctionKwArgs[vs.VideoNode, vs.VideoNode] = partial(DFTTest().denoise, sigma=8),
         mode: NoiseProcessMode = NoiseProcessMode.IDENTIFY,
         deint: NoiseDeintMode = NoiseDeintMode.GENERATE,
         stabilize: tuple[float, float] | Literal[False] = (0.6, 0.2),
@@ -613,7 +606,7 @@ class QTempGaussMC(vs_object):
         if self.prefilter_tr:
             scenechange = self.prefilter_sc_threshold is not False
 
-            scenes = search.misc.SCDetect(self.prefilter_sc_threshold) if scenechange else search
+            scenes = sc_detect(search, self.prefilter_sc_threshold) if scenechange else search
             smoothed = BlurMatrix.BINOMIAL(self.prefilter_tr, mode=ConvMode.TEMPORAL, scenechange=scenechange)(scenes)
             smoothed = self.mask_shimmer(smoothed, search, **self.prefilter_mask_shimmer_args)
         else:
@@ -665,7 +658,7 @@ class QTempGaussMC(vs_object):
                         case self.NoiseDeintMode.WEAVE:
                             noise = noise.std.SeparateFields(self.tff).std.DoubleWeave(self.tff)
                         case self.NoiseDeintMode.BOB:
-                            noise = noise.resize.Bob(tff=self.tff)
+                            noise = Catrom().bob(noise, tff=self.tff)
                         case self.NoiseDeintMode.GENERATE:
                             noise_source = noise.std.SeparateFields(self.tff)
 
@@ -936,7 +929,7 @@ class QTempGaussMC(vs_object):
         def _floor_div_tuple(x: tuple[int, int]) -> tuple[int, int]:
             return (x[0] // 2, x[1] // 2)
 
-        self.draft = self.clip.resize.Bob(tff=self.tff) if self.input_type == self.InputType.INTERLACE else self.clip
+        self.draft = Catrom().bob(self.clip, tff=self.tff) if self.input_type == self.InputType.INTERLACE else self.clip
         self.thscd = thscd
 
         tr = max(1, force_tr, self.denoise_tr, self.basic_tr, self.match_tr, self.final_tr)

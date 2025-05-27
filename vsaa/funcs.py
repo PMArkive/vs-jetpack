@@ -202,6 +202,7 @@ def based_aa(
 
     if supersampler is False:
         supersampler = downscaler = NoScale[Catrom]
+        rfactor = 1.0
 
     aaw, aah = [round(dimension * rfactor) for dimension in (func.work_clip.width, func.work_clip.height)]
 

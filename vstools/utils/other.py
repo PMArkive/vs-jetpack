@@ -30,14 +30,6 @@ def get_nvidia_version() -> tuple[int, int] | None:
     """Check if nvidia drivers are installed and if available return the version."""
 
     try:
-        nvcc = run(['nvcc', '--version'], capture_output=True)
-    except FileNotFoundError:
-        pass
-    else:
-        if not nvcc.returncode:
-            return _str_to_ver(nvcc.stdout.splitlines()[3].decode().split(',')[-2].replace('release', ''))
-
-    try:
         smi = run(['nvidia-smi', '-q'], capture_output=True)
     except FileNotFoundError:
         pass

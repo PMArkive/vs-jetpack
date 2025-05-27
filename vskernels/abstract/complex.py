@@ -487,7 +487,7 @@ class KeepArScaler(Scaler):
         )
 
         kwargs, shift = sample_grid_model.for_dst(clip, width, height, shift, **kwargs)
-        padded, shift = border_handling.prepare_clip(clip, self.kernel_radius)
+        padded, shift = border_handling.prepare_clip(clip, self.kernel_radius, shift)
 
         scaled = super().scale(padded, width, height, shift, **kwargs)
 

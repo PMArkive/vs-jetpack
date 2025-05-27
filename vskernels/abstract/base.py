@@ -11,7 +11,7 @@ from inspect import Signature
 from math import ceil
 from types import NoneType
 from typing import (
-    TYPE_CHECKING, Any, Callable, ClassVar, Concatenate, Literal, NoReturn, TypeVar, Union, cast, overload
+    TYPE_CHECKING, Any, Callable, ClassVar, Concatenate, Literal, NoReturn, TypeVar, Union, cast, get_origin, overload
 )
 
 from jetpytools import P, R, T_co
@@ -107,7 +107,7 @@ def _base_from_param(
         except KeyError:
             raise exception_cls(func_except or cls.from_param, value)
 
-    if isinstance(value, type):
+    if isinstance(value, type) or isinstance(get_origin(value), type):
         return cast(type[_BaseScalerT], value)
 
     if isinstance(value, cls):

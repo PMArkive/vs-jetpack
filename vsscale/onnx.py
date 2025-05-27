@@ -635,7 +635,71 @@ class BaseWaifu2xRGB(BaseWaifu2x):
         return clip
 
 
-class Waifu2x(BaseWaifu2xRGB):
+class _Waifu2xCunet(BaseWaifu2xRGB):
+    _model = 6
+    _static_kernel_radius = 16
+
+    if TYPE_CHECKING:
+        def scale(
+            self,
+            clip: vs.VideoNode,
+            width: int | None = None,
+            height: int | None = None,
+            shift: tuple[float, float] = (0, 0),
+            **kwargs: Any
+        ) -> ConstantFormatVideoNode:
+            """
+            Scale the given clip using the ONNX model.
+
+            :param clip:        The input clip to be scaled.
+            :param width:       The target width for scaling. If None, the width of the input clip will be used.
+            :param height:      The target height for scaling. If None, the height of the input clip will be used.
+            :param shift:       A tuple representing the shift values for the x and y axes.
+            :param **kwargs:    Additional arguments to be passed to the `preprocess_clip`, `postprocess_clip`,
+                                `inference`, and `_final_scale` methods.
+                                Use the prefix `preprocess_` or `postprocess_` to pass an argument to the respective method.
+                                Use the prefix `inference_` to pass an argument to the inference method.
+                                
+                                Additional Notes for the Cunet model:
+                                - The model can cause artifacts around the image edges.
+                                To mitigate this, mirrored padding is applied to the image before inference.  
+                                This behavior can be disabled by setting `inference_no_pad=True`.
+                                - A tint issue is also present but it is not constant. It leaves flat areas alone but tints detailed areas.
+                                Since most people will use Cunet to rescale details, the tint fix is enabled by default.
+                                This behavior can be disabled with `postprocess_no_tint_fix=True`
+
+            :return:            The scaled clip.
+            """
+            ...
+
+    def inference(self, clip: ConstantFormatVideoNode, **kwargs: Any) -> ConstantFormatVideoNode:
+        # Cunet model ruins image borders, so we need to pad it before upscale and crop it after.
+        if kwargs.pop("no_pad", False):
+            return super().inference(clip, **kwargs)
+
+        with padder.ctx(16, 4) as pad:
+            padded = pad.MIRROR(clip)
+            scaled = super().inference(padded, **kwargs)
+            cropped = pad.CROP(scaled)
+
+        return cropped
+
+    def postprocess_clip(self, clip: vs.VideoNode, input_clip: vs.VideoNode, **kwargs: Any) -> ConstantFormatVideoNode:
+        # Cunet model also has a tint issue but it is not constant
+        # It leaves flat areas alone but tints detailed areas.
+        # Since most people will use Cunet to rescale details, the tint fix is enabled by default.
+        if kwargs.pop("no_tint_fix", False):
+            return super().postprocess_clip(clip, input_clip, **kwargs)
+
+        tint_fix = norm_expr(
+            clip, 'x 0.5 255 / + 0 1 clamp',
+            planes=0 if get_video_format(input_clip).color_family is vs.GRAY else None,
+            func="Waifu2x." + self.__class__.__name__
+        )
+        return super().postprocess_clip(tint_fix, input_clip, **kwargs)
+
+
+class Waifu2x(_Waifu2xCunet):
     """
     Well known Image Super-Resolution for Anime-Style Art.
 
@@ -648,8 +712,6 @@ class Waifu2x(BaseWaifu2xRGB):
     doubled = Waifu2x().scale(clip, clip.width * 2, clip.height * 2)
     ```
     """
-    _model = 6
-    _static_kernel_radius = 16
 
     class AnimeStyleArt(BaseWaifu2x):
         """
@@ -729,7 +791,7 @@ class Waifu2x(BaseWaifu2xRGB):
         """
         _model = 5
 
-    class Cunet(BaseWaifu2xRGB):
+    class Cunet(_Waifu2xCunet):
         """
         CUNet (Compact U-Net) model for anime art.
 
@@ -740,68 +802,7 @@ class Waifu2x(BaseWaifu2xRGB):
         doubled = Waifu2x.Cunet().scale(clip, clip.width * 2, clip.height * 2)
         ```
         """
-        _model = 6
-        _static_kernel_radius = 16
-
-        if TYPE_CHECKING:
-            def scale(
-                self,
-                clip: vs.VideoNode,
-                width: int | None = None,
-                height: int | None = None,
-                shift: tuple[float, float] = (0, 0),
-                **kwargs: Any
-            ) -> ConstantFormatVideoNode:
-                """
-                Scale the given clip using the ONNX model.
-
-                :param clip:        The input clip to be scaled.
-                :param width:       The target width for scaling. If None, the width of the input clip will be used.
-                :param height:      The target height for scaling. If None, the height of the input clip will be used.
-                :param shift:       A tuple representing the shift values for the x and y axes.
-                :param **kwargs:    Additional arguments to be passed to the `preprocess_clip`, `postprocess_clip`,
-                                    `inference`, and `_final_scale` methods.
-                                    Use the prefix `preprocess_` or `postprocess_` to pass an argument to the respective method.
-                                    Use the prefix `inference_` to pass an argument to the inference method.
-                                    
-                                    Additional Notes for the Cunet model:
-                                    - The model can cause artifacts around the image edges.
-                                    To mitigate this, mirrored padding is applied to the image before inference.  
-                                    This behavior can be disabled by setting `inference_no_pad=True`.
-                                    - A tint issue is also present but it is not constant. It leaves flat areas alone but tints detailed areas.
-                                    Since most people will use Cunet to rescale details, the tint fix is enabled by default.
-                                    This behavior can be disabled with `postprocess_no_tint_fix=True`
-
-                :return:            The scaled clip.
-                """
-                ...
-
-        def inference(self, clip: ConstantFormatVideoNode, **kwargs: Any) -> ConstantFormatVideoNode:
-            # Cunet model ruins image borders, so we need to pad it before upscale and crop it after.
-            if kwargs.pop("no_pad", False):
-                return super().inference(clip, **kwargs)
-
-            with padder.ctx(16, 4) as pad:
-                padded = pad.MIRROR(clip)
-                scaled = super().inference(padded, **kwargs)
-                cropped = pad.CROP(scaled)
-
-            return cropped
-
-        def postprocess_clip(self, clip: vs.VideoNode, input_clip: vs.VideoNode, **kwargs: Any) -> ConstantFormatVideoNode:
-            # Cunet model also has a tint issue but it is not constant
-            # It leaves flat areas alone but tints detailed areas.
-            # Since most people will use Cunet to rescale details, the tint fix is enabled by default.
-            if kwargs.pop("no_tint_fix", False):
-                return super().postprocess_clip(clip, input_clip, **kwargs)
-
-            tint_fix = norm_expr(
-                clip, 'x 0.5 255 / + 0 1 clamp',
-                planes=0 if get_video_format(input_clip).color_family is vs.GRAY else None,
-                func="Waifu2x." + self.__class__.__name__
-            )
-            return super().postprocess_clip(tint_fix, input_clip, **kwargs)
-
+  
     class SwinUnetArt(BaseWaifu2xRGB):
         """
         Swin-Unet-based model trained on anime-style images.
@@ -876,6 +877,8 @@ class BaseDPIR(BaseOnnxScaler):
         **kwargs: Any
     ) -> None:
         """
+        Initializes the class with the specified parameters.
+
         :param strength:        Threshold (8-bit scale) strength for deblocking/denoising.
                                 If a VideoNode is used, it must be in GRAY8, GRAYH, or GRAYS format, with pixel values
                                 representing the 8-bit thresholds.
@@ -974,7 +977,9 @@ class DPIR(BaseDPIR):
     _model = (2, 3)
 
     class DrunetDenoise(BaseDPIR):
+        """DPIR model for denoising."""
         _model = (0, 1)
 
     class DrunetDeblock(BaseDPIR):
+        """DPIR model for deblocking."""
         _model = (2, 3)

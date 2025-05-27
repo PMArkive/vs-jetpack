@@ -47,6 +47,8 @@ class BaseGenericScaler(Scaler, ABC):
         **kwargs: Any
     ) -> None:
         """
+        Initializes the BaseGenericScaler.
+
         :param kernel:      Base kernel to be used for certain scaling/shifting/resampling operations.
                             Defaults to Catrom.
         :param scaler:      Scaler used for scaling operations. Defaults to kernel.

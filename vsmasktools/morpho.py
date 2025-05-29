@@ -753,8 +753,6 @@ class Morpho:
         else:
             conv_mode = ConvMode.SQUARE
 
-        xxflate_func: GenericVSFunction[ConstantFormatVideoNode]
-
         if not complexpr_available:
             if radius > 1 or conv_mode != ConvMode.SQUARE:
                 raise CustomValueError(

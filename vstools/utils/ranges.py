@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import partial
-from typing import Any, Callable, Literal, Protocol, Sequence, TypeVar, Union, overload
+from typing import Callable, Literal, Protocol, Sequence, TypeGuard, TypeVar, Union, overload
 
 import vapoursynth as vs
 
@@ -22,8 +21,6 @@ __all__ = [
     'interleave_arr',
 ]
 
-
-_gc_func_gigacope = list[Any]()
 
 _VideoFrameT_contra = TypeVar(
     "_VideoFrameT_contra",
@@ -54,6 +51,27 @@ _RangesCallBackT = Union[
     _RangesCallBackF[Sequence[vs.VideoFrame]],
     _RangesCallBackNF[Sequence[vs.VideoFrame]],
 ]
+
+def _is_cb_nf(cb: Callable[..., bool], params: set[str]) -> TypeGuard[
+    _RangesCallBackNF[vs.VideoFrame] | _RangesCallBackNF[Sequence[vs.VideoFrame]]
+]:
+    if 'f' in params and 'n' in params:
+        return True
+    return False
+
+
+def _is_cb_f(cb: Callable[..., bool], params: set[str]) -> TypeGuard[
+    _RangesCallBackF[vs.VideoFrame] | _RangesCallBackF[Sequence[vs.VideoFrame]]
+]:
+    if 'f' in params:
+        return True
+    return False
+
+
+def _is_cb_n(cb: Callable[..., bool], params: set[str]) -> TypeGuard[_RangesCallBack]:
+    if 'n' in params:
+        return True
+    return False
 
 
 @overload
@@ -334,39 +352,21 @@ def replace_ranges(
                 replace_ranges
             )
 
-        def _func_nf(
-            n: int, f: vs.VideoFrame | Sequence[vs.VideoFrame],
-            callback: _RangesCallBackNF[vs.VideoFrame | Sequence[vs.VideoFrame]]
-        ) -> vs.VideoNode:
-            return clip_b if callback(n, f) else clip_a
-
-        def _func_f(
-            n: int, f: vs.VideoFrame | Sequence[vs.VideoFrame],
-            callback: _RangesCallBackF[vs.VideoFrame | Sequence[vs.VideoFrame]]
-        ) -> vs.VideoNode:
-            return clip_b if callback(f) else clip_a
-
-        def _func_n(n: int, callback: _RangesCallBack) -> vs.VideoNode:
-            return clip_b if callback(n) else clip_a
-
-        _func: Callable[..., vs.VideoNode]
-
-        if 'f' in params and 'n' in params:
-            _func = _func_nf
-        elif 'f' in params:
-            _func = _func_f
-        elif 'n' in params:
-            _func = _func_n
-        else:
-            raise CustomValueError(
-                'Callback must have signature ((n, f) | (n) | (f)) -> bool!', replace_ranges, callback
+        if _is_cb_nf(callback, params):
+            return vs.core.std.FrameEval(
+                base_clip, lambda n, f: clip_b if callback(n, f) else clip_a, prop_src, [clip_a, clip_b]
+            )
+        if _is_cb_f(callback, params):
+            return vs.core.std.FrameEval(
+                base_clip, lambda n, f: clip_b if callback(f) else clip_a, prop_src, [clip_a, clip_b]
+            )
+        if _is_cb_n(callback, params):
+            return vs.core.std.FrameEval(
+                base_clip, lambda n: clip_b if callback(n) else clip_a, None, [clip_a, clip_b]
             )
 
-        _func.__callback = callback  # type: ignore[attr-defined]
-        _gc_func_gigacope.append(_func)
-
-        return vs.core.std.FrameEval(
-            base_clip, partial(_func, callback=callback), prop_src if 'f' in params else None, [clip_a, clip_b]
+        raise CustomValueError(
+            'Callback must have signature ((n, f) | (n) | (f)) -> bool!', replace_ranges, callback
         )
 
     shift = 1 - exclusive

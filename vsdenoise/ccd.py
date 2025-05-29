@@ -218,7 +218,7 @@ def ccd(
 
         def _get_weight_expr(x: int, y: int, c: str, weight: float | None = None) -> str:
             scale_str = peak != 1 and f'{peak} / ' or ''
-            weigth_str = weight is not None and f'{weight_b} *' or ''  # type: ignore
+            weigth_str = weight is not None and f'{weight_b} *' or ''
 
             return f'{c}[{x},{y}] {c} - {scale_str} 2 pow {weigth_str}'
 
@@ -276,7 +276,7 @@ def ccd(
     if not is_subsampled:
         yuv, yuvref = src, ref
     elif mode in {CCDMode.NNEDI_BICUBIC, CCDMode.NNEDI_SSIM}:
-        ref_clips = list[list[ConstantFormatVideoNode] | None]([split(src), ref and split(ref) or None])  # pyright: ignore
+        ref_clips = list[list[ConstantFormatVideoNode] | None]([split(src), ref and split(ref) or None])  # pyright: ignore[reportArgumentType]
 
         src_left += 0.125 * divw
 

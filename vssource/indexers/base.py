@@ -258,7 +258,7 @@ class ExternalIndexer(Indexer):
         return self.get_idx_file_path(PackageStorage(folder).get_file(filename))
 
     @inject_self
-    def source(  # type: ignore
+    def source(
         self, file: SPathLike | Sequence[SPathLike],
         bits: int | None = None, *,
         matrix: MatrixT | None = None,

@@ -660,7 +660,7 @@ class GenericChromaRecon(ChromaReconstruct):
         return luma
 
     @inject_self.init_kwargs
-    def reconstruct(  # type: ignore
+    def reconstruct(
         self, clip: vs.VideoNode, sigma: float = 1.5, radius: int = 2,
         diff_mode: ReconDiffMode | ReconDiffModeConf = ReconDiffMode.MEAN,
         out_mode: ReconOutput | bool | None = ReconOutput.i420,
@@ -748,7 +748,7 @@ class PAWorksChromaRecon(MissingFieldsChromaRecon):
         return limit_filter(a, y_base, a, thr=1, elast=4.5, bright_thr=10)
 
     @inject_self.init_kwargs
-    def reconstruct(  # type: ignore
+    def reconstruct(
         self, clip: vs.VideoNode, sigma: float = 2.0, radius: int = 4,
         diff_mode: ReconDiffMode | ReconDiffModeConf = ReconDiffMode.MEDIAN,
         out_mode: ReconOutput | bool | None = ReconOutput.NATIVE,
@@ -775,7 +775,7 @@ class Point422ChromaRecon(MissingFieldsChromaRecon):
         return self._dm_wscaler.scale(demangled, y_base.width, y_base.height, (self.src_top, self.src_left))
 
     @inject_self.init_kwargs
-    def reconstruct(  # type: ignore
+    def reconstruct(
         self, clip: vs.VideoNode, sigma: float = 1.5, radius: int = 2,
         diff_mode: ReconDiffMode | ReconDiffModeConf = ReconDiffMode.MEDIAN,
         out_mode: ReconOutput | bool | None = ReconOutput.i444,

@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, replace
 from enum import IntFlag, auto
-from typing import Any, Sequence
+from typing import Any, Protocol, Sequence, runtime_checkable
 
 from typing_extensions import Self
 
-from vskernels import Catrom, LeftShift, Scaler, TopShift, ComplexScalerLike, ComplexScaler
+from vskernels import Catrom, ComplexScaler, ComplexScalerLike, LeftShift, Scaler, TopShift
 from vstools import (
-    ChromaLocation, ConstantFormatVideoNode, VSFunctionAllArgs, VSFunctionNoArgs, VideoNodeT, check_variable, core,
+    ChromaLocation, ConstantFormatVideoNode, VideoNodeT, VSFunctionAllArgs, VSFunctionNoArgs, check_variable, core,
     normalize_seq, vs, vs_object
 )
 
@@ -20,7 +20,9 @@ __all__ = [
     "EEDI2",
     "EEDI3",
     "SangNom",
-    "BWDIF"
+    "BWDIF",
+
+    "SupportsBobDeinterlace"
 ]
 
 
@@ -89,6 +91,19 @@ class Deinterlacer(vs_object, ABC):
     def copy(self, **kwargs: Any) -> Self:
         """Returns a new Antialiaser class replacing specified fields with new values"""
         return replace(self, **kwargs)
+
+
+@runtime_checkable
+class SupportsBobDeinterlace(Protocol):
+    """
+    Protocol for classes that support bob deinterlacing.
+    """
+
+    __slots__ = ()
+
+    def bob(self, clip: vs.VideoNode, **kwargs: Any) -> ConstantFormatVideoNode: ...
+
+    def deinterlace(self, clip: vs.VideoNode, **kwargs: Any) -> ConstantFormatVideoNode: ...
 
 
 @dataclass(kw_only=True)

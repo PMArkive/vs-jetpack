@@ -47,8 +47,6 @@ def _add_init_kwargs(method: Callable[Concatenate[_BaseScalerT, P], R]) -> Calla
 
     @functools.wraps(method)
     def _wrapped(self: _BaseScalerT, *args: P.args, **kwargs: P.kwargs) -> R:
-        init_kwargs = dict[str, Any]()
-
         # TODO: remove this
         if not TYPE_CHECKING:
             if isinstance(self, vs.VideoNode):
@@ -82,11 +80,13 @@ def _add_init_kwargs(method: Callable[Concatenate[_BaseScalerT, P], R]) -> Calla
                     frame_infos.clear()
                     del frame_info, f0, f1
 
-        for k in self.kwargs.copy():
-            if k in signature.parameters:
-                init_kwargs[k] = self.kwargs.get(k)
+        init_kwargs = {k: self.kwargs.pop(k) for k in self.kwargs.keys() & signature.parameters.keys()}
 
-        return method(self, *args, **init_kwargs | kwargs)
+        returned = method(self, *args, **init_kwargs | kwargs)
+
+        self.kwargs |= init_kwargs
+
+        return returned
 
     setattr(_wrapped, "__has_init_kwargs__", True)
 

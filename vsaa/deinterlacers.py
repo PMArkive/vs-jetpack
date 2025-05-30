@@ -40,17 +40,18 @@ class Deinterlacer(vs_object, ABC):
         """Get the plugin function."""
 
     @abstractmethod
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
         """
         Performs deinterlacing if dh is False or doubling if dh is True.
 
         Subclasses should handle tff to field if needed and add the kwargs from `get_deint_args`
 
-        :param clip:    The input clip.
-        :param tff:     The field order of the input clip.
-        :param dh:      If True, doubles the height of the input by copying each line to every other line of the output,
-                        with the missing lines interpolated.
-        :return:        Interpolated clip.
+        :param clip:        The input clip.
+        :param tff:         The field order of the input clip.
+        :param double_rate: Whether to double the FPS.
+        :param dh:          If True, doubles the height of the input by copying each line to every other line of the output,
+                            with the missing lines interpolated.
+        :return:            Interpolated clip.
         """
 
     @abstractmethod
@@ -71,7 +72,17 @@ class Deinterlacer(vs_object, ABC):
         :param kwargs:  Additional arguments passed to the plugin function.
         :return:        Deinterlaced clip.
         """
-        return self._interpolate(clip, self.tff, False, **kwargs)
+        return self._interpolate(clip, self.tff, self.double_rate, False, **kwargs)
+    
+    def bob(self, clip: vs.VideoNode, **kwargs: Any) -> ConstantFormatVideoNode:
+        """
+        Apply bob deinterlacing to the given clip.
+
+        :param clip:    The input clip.
+        :param kwargs:  Additional arguments passed to the plugin function.
+        :return:        Deinterlaced clip.
+        """
+        return self._interpolate(clip, self.tff, True, False, **kwargs)
 
     def copy(self, **kwargs: Any) -> Self:
         """Returns a new Antialiaser class replacing specified fields with new values"""
@@ -209,7 +220,7 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
                 if is_width:
                     clip = self.transpose(clip)
 
-                clip = self._interpolate(clip, tff, True, **kwargs)
+                clip = self._interpolate(clip, tff, False, True, **kwargs)
 
                 if is_width:
                     clip = self.transpose(clip)
@@ -247,7 +258,7 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
 
 
 @dataclass
-class NNEDI3(SuperSampler, AntiAliaser):
+class NNEDI3(SuperSampler):
     """
     Neural Network Edge Directed Interpolation (3rd gen.)
 
@@ -324,8 +335,8 @@ class NNEDI3(SuperSampler, AntiAliaser):
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.sneedif.NNEDI3 if self.opencl else core.lazy.znedi3.nnedi3
 
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
-        field = int(tff) + int(self.double_rate) * 2
+    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+        field = int(tff) + int(double_rate) * 2
 
         return self._deinterlacer_function(clip, field, dh, **self.get_deint_args(**kwargs))
 
@@ -352,7 +363,7 @@ class NNEDI3(SuperSampler, AntiAliaser):
 
 
 @dataclass
-class EEDI2(SuperSampler, AntiAliaser):
+class EEDI2(SuperSampler):
     """Enhanced Edge Directed Interpolation (2nd gen.)"""
 
     mthresh: int = 10
@@ -431,14 +442,13 @@ class EEDI2(SuperSampler, AntiAliaser):
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.eedi2cuda.EEDI2 if self.cuda else core.lazy.eedi2.EEDI2
 
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
-        field = int(tff)
+    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+        field = int(tff) + int(double_rate) * 2
 
         if not dh:
-            field += int(self.double_rate) * 2
             clip = clip.std.SeparateFields(tff)
 
-            if not self.double_rate:
+            if not double_rate:
                 clip = clip[::2]
 
         return self._deinterlacer_function(clip, field, **self.get_deint_args(**kwargs))
@@ -462,7 +472,7 @@ class EEDI2(SuperSampler, AntiAliaser):
 
 
 @dataclass
-class EEDI3(SuperSampler, AntiAliaser):
+class EEDI3(SuperSampler):
     """Enhanced Edge Directed Interpolation (3rd gen.)"""
 
     alpha: float = 0.2
@@ -563,9 +573,8 @@ class EEDI3(SuperSampler, AntiAliaser):
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.eedi3m.EEDI3CL if self.opencl else core.lazy.eedi3m.EEDI3
 
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
-        field = int(tff) if dh else int(tff) + int(self.double_rate) * 2
-        mult = (0 if dh else int(self.double_rate)) + 1
+    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+        field = int(tff) + int(double_rate) * 2
 
         kwargs = self.get_deint_args(**kwargs)
 
@@ -576,7 +585,7 @@ class EEDI3(SuperSampler, AntiAliaser):
             kwargs.update(mclip=self.mclip(clip))
 
         if sclip := kwargs.get('sclip'):
-            if sclip.num_frames * 2 == clip.num_frames * mult:
+            if sclip.num_frames * 2 == clip.num_frames * (int(double_rate) + 1):
                 kwargs.update(sclip=core.std.Interleave([sclip] * 2))
 
         return self._deinterlacer_function(clip, field, dh, **kwargs)
@@ -626,7 +635,7 @@ class EEDI3(SuperSampler, AntiAliaser):
 
 
 @dataclass
-class SangNom(SuperSampler, AntiAliaser):
+class SangNom(SuperSampler):
     """SangNom single field deinterlacer using edge-directed interpolation"""
 
     aa: int | Sequence[int] | None = None
@@ -639,8 +648,8 @@ class SangNom(SuperSampler, AntiAliaser):
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.sangnom.SangNom
 
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
-        if self.double_rate and not dh:
+    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+        if double_rate:
             order = 0
             clip = clip.std.SeparateFields(tff).std.DoubleWeave(tff)
         else:
@@ -670,8 +679,8 @@ class BWDIF(Deinterlacer):
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.bwdif.Bwdif
 
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
-        field = int(tff) + int(self.double_rate) * 2
+    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+        field = int(tff) + int(double_rate) * 2
 
         if callable(self.edeint):
             kwargs.update(edeint=self.edeint(clip))

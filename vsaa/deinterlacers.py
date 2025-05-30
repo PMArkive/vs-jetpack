@@ -73,7 +73,7 @@ class Deinterlacer(vs_object, ABC):
         :return:        Deinterlaced clip.
         """
         return self._interpolate(clip, self.tff, self.double_rate, False, **kwargs)
-    
+
     def bob(self, clip: vs.VideoNode, **kwargs: Any) -> ConstantFormatVideoNode:
         """
         Apply bob deinterlacing to the given clip.

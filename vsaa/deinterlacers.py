@@ -40,7 +40,9 @@ class Deinterlacer(vs_object, ABC):
         """Get the plugin function."""
 
     @abstractmethod
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+    def _interpolate(
+        self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any
+    ) -> ConstantFormatVideoNode:
         """
         Performs deinterlacing if dh is False or doubling if dh is True.
 
@@ -335,7 +337,9 @@ class NNEDI3(SuperSampler):
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.sneedif.NNEDI3 if self.opencl else core.lazy.znedi3.nnedi3
 
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+    def _interpolate(
+        self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any
+    ) -> ConstantFormatVideoNode:
         field = int(tff) + int(double_rate) * 2
 
         return self._deinterlacer_function(clip, field, dh, **self.get_deint_args(**kwargs))
@@ -442,7 +446,9 @@ class EEDI2(SuperSampler):
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.eedi2cuda.EEDI2 if self.cuda else core.lazy.eedi2.EEDI2
 
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+    def _interpolate(
+        self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any
+    ) -> ConstantFormatVideoNode:
         field = int(tff) + int(double_rate) * 2
 
         if not dh:
@@ -573,7 +579,9 @@ class EEDI3(SuperSampler):
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.eedi3m.EEDI3CL if self.opencl else core.lazy.eedi3m.EEDI3
 
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+    def _interpolate(
+        self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any
+    ) -> ConstantFormatVideoNode:
         field = int(tff) + int(double_rate) * 2
 
         kwargs = self.get_deint_args(**kwargs)
@@ -648,7 +656,9 @@ class SangNom(SuperSampler):
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.sangnom.SangNom
 
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+    def _interpolate(
+        self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any
+    ) -> ConstantFormatVideoNode:
         if double_rate:
             order = 0
             clip = clip.std.SeparateFields(tff).std.DoubleWeave(tff)
@@ -679,7 +689,9 @@ class BWDIF(Deinterlacer):
     def _deinterlacer_function(self) -> VSFunctionAllArgs[vs.VideoNode, ConstantFormatVideoNode]:
         return core.lazy.bwdif.Bwdif
 
-    def _interpolate(self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any) -> ConstantFormatVideoNode:
+    def _interpolate(
+        self, clip: vs.VideoNode, tff: bool, double_rate: bool, dh: bool, **kwargs: Any
+    ) -> ConstantFormatVideoNode:
         field = int(tff) + int(double_rate) * 2
 
         if callable(self.edeint):

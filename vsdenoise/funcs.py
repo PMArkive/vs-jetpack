@@ -23,8 +23,8 @@ from .mvtools import MotionVectors, MVTools, MVToolsPreset
 from .prefilters import PrefilterLike
 
 __all__ = [
-    "mc_degrain",
     "mc_clamp",
+    "mc_degrain",
 ]
 
 

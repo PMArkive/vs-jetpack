@@ -9,7 +9,7 @@ from vstools import ConstantFormatVideoNode, CustomIntEnum, KwargsT, check_varia
 
 from .abstract import Debander
 
-__all__ = ["PlaceboDither", "Placebo"]
+__all__ = ["Placebo", "PlaceboDither"]
 
 
 @deprecated('"PlaceboDither" is deprecated, use "placebo_deband.Dither" instead.', category=DeprecationWarning)

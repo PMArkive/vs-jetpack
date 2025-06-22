@@ -9,10 +9,7 @@ from vstools import ConstantFormatVideoNode, CustomIntEnum, KwargsT, check_varia
 
 from .abstract import Debander
 
-__all__ = [
-    'PlaceboDither',
-    'Placebo'
-]
+__all__ = ["PlaceboDither", "Placebo"]
 
 
 @deprecated('"PlaceboDither" is deprecated, use "placebo_deband.Dither" instead.', category=DeprecationWarning)
@@ -79,8 +76,13 @@ class Placebo(Debander):
     @deprecated('"Placebo.deband" is deprecated, use "placebo_deband.Dither" instead.', category=DeprecationWarning)
     @inject_self
     def deband(  # type: ignore[override]
-        self, clip: vs.VideoNode, radius: float = 16.0, thr: float | list[float] = 3.0,
-        iterations: int = 4, grain: float | list[float] = 0.0, dither: PlaceboDither = PlaceboDither.DEFAULT
+        self,
+        clip: vs.VideoNode,
+        radius: float = 16.0,
+        thr: float | list[float] = 3.0,
+        iterations: int = 4,
+        grain: float | list[float] = 0.0,
+        dither: PlaceboDither = PlaceboDither.DEFAULT,
     ) -> vs.VideoNode:
         """
         Main deband function, wrapper for `placebo.Deband <https:/github.com/Lypheo/vs-placebo#vs-placebo>`_

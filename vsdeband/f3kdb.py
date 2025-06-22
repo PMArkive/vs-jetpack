@@ -12,11 +12,7 @@ from vstools import (
 
 from .abstract import Debander
 
-__all__ = [
-    'SampleMode',
-    'RandomAlgo',
-    'F3kdb'
-]
+__all__ = ["SampleMode", "RandomAlgo", "F3kdb"]
 
 
 @deprecated('"SampleMode" is deprecated, use "f3k_deband.SampleMode" instead.', category=DeprecationWarning)
@@ -43,15 +39,16 @@ class SampleMode(CustomIntEnum):
             Literal[SampleMode.SQUARE],
             Literal[SampleMode.ROW],
             Literal[SampleMode.COL_ROW_MEAN],
-        ]
-    ) -> NoReturn:
-        ...
+        ],
+    ) -> NoReturn: ...
 
     @overload
     def __call__(  # type: ignore
-        self: Literal[SampleMode.MEAN_DIFF], thr_mid: int | list[int], thr_max: int | list[int], /,
-    ) -> SampleModeMidDiffInfo:
-        ...
+        self: Literal[SampleMode.MEAN_DIFF],
+        thr_mid: int | list[int],
+        thr_max: int | list[int],
+        /,
+    ) -> SampleModeMidDiffInfo: ...
 
     def __call__(self, *args: Any) -> Any:
         if self != SampleMode.MEAN_DIFF:
@@ -84,7 +81,11 @@ class RandomAlgo(CustomIntEnum):
         ...
 
     @overload
-    def __call__(self: Literal[RandomAlgo.GAUSSIAN], sigma: float, /,) -> RandomAlgoWithInfo:  # type: ignore
+    def __call__(
+        self: Literal[RandomAlgo.GAUSSIAN],
+        sigma: float,
+        /,
+    ) -> RandomAlgoWithInfo:  # type: ignore
         """
         StdDev (sigma).
         Only values in [-1.0, 1.0] is used for multiplication, numbers outside this range are simply ignored)
@@ -130,7 +131,8 @@ class F3kdb(Debander):
     @deprecated('"F3kdb.deband" is deprecated, use "f3k_deband" instead.', category=DeprecationWarning)
     @inject_self
     def deband(  # type: ignore[override]
-        self, clip: vs.VideoNode,
+        self,
+        clip: vs.VideoNode,
         radius: int = 16,
         thr: int | list[int] = 96,
         grain: float | list[float] = 0.0,
@@ -140,7 +142,7 @@ class F3kdb(Debander):
         seed: int | None = None,
         random: RandomAlgoT | tuple[RandomAlgoT, RandomAlgoT] = RandomAlgo.UNIFORM,
         planes: PlanesT = None,
-        _func: FuncExceptT | None = None
+        _func: FuncExceptT | None = None,
     ) -> vs.VideoNode:
         """
         :param clip:            Input clip.
@@ -160,11 +162,11 @@ class F3kdb(Debander):
         """
         func = FunctionUtil(clip, _func or self.deband, planes, (vs.GRAY, vs.YUV), (8, 16))
 
-        if not hasattr(core, 'neo_f3kdb'):
-            raise CustomRuntimeError('You are missing the neo_f3kdb plugin!', func.func)
+        if not hasattr(core, "neo_f3kdb"):
+            raise CustomRuntimeError("You are missing the neo_f3kdb plugin!", func.func)
 
-        if 'y_2' not in core.neo_f3kdb.Deband.__signature__.parameters:  # type: ignore
-            raise CustomRuntimeError('You are using an outdated version of neo_f3kdb, upgrade now!', func.func)
+        if "y_2" not in core.neo_f3kdb.Deband.__signature__.parameters:  # type: ignore
+            raise CustomRuntimeError("You are using an outdated version of neo_f3kdb, upgrade now!", func.func)
 
         radius = fallback(self.radius, radius)
 
@@ -199,10 +201,34 @@ class F3kdb(Debander):
         blur_first = fallback(self.blur_first or blur_first, max(y, cb, cr) < 2048)  # type: ignore
 
         debanded = core.neo_f3kdb.Deband(
-            func.work_clip, radius, y, cb, cr, gry * 255 * 0.8, grc * 255 * 0.8,  # type: ignore
-            sample_mode.value, self.seed or seed, blur_first, self.dynamic_grain or dynamic_grain,
-            None, None, None, False, 16, random_algo_ref, random_algo_grain,
-            random_param_ref, random_param_grain, None, y1, cb1, cr1, y2, cb2, cr2, True
+            func.work_clip,
+            radius,
+            y,
+            cb,
+            cr,
+            gry * 255 * 0.8,
+            grc * 255 * 0.8,  # type: ignore
+            sample_mode.value,
+            self.seed or seed,
+            blur_first,
+            self.dynamic_grain or dynamic_grain,
+            None,
+            None,
+            None,
+            False,
+            16,
+            random_algo_ref,
+            random_algo_grain,
+            random_param_ref,
+            random_param_grain,
+            None,
+            y1,
+            cb1,
+            cr1,
+            y2,
+            cb2,
+            cr2,
+            True,
         )
 
         return func.return_clip(debanded)

@@ -8,22 +8,28 @@ from typing_extensions import Self
 
 from vskernels import Catrom, ComplexScaler, ComplexScalerLike, LeftShift, Scaler, TopShift
 from vstools import (
-    ChromaLocation, ConstantFormatVideoNode, VideoNodeT, VSFunctionAllArgs, VSFunctionNoArgs, check_variable, core,
-    normalize_seq, vs, vs_object
+    ChromaLocation,
+    ConstantFormatVideoNode,
+    VideoNodeT,
+    VSFunctionAllArgs,
+    VSFunctionNoArgs,
+    check_variable,
+    core,
+    normalize_seq,
+    vs,
+    vs_object,
 )
 
 __all__ = [
     "Deinterlacer",
     "AntiAliaser",
     "SuperSampler",
-
     "NNEDI3",
     "EEDI2",
     "EEDI3",
     "SangNom",
     "BWDIF",
-
-    "SupportsBobDeinterlace"
+    "SupportsBobDeinterlace",
 ]
 
 
@@ -188,7 +194,7 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
         width: int | None = None,
         height: int | None = None,
         shift: tuple[TopShift, LeftShift] = (0, 0),
-        **kwargs: Any
+        **kwargs: Any,
     ) -> ConstantFormatVideoNode:
         """
         Scale the given clip using super sampling method.
@@ -208,11 +214,11 @@ class SuperSampler(AntiAliaser, Scaler, ABC):
         sy, sx = shift
 
         cloc = list(ChromaLocation.from_video(clip).get_offsets(clip))
-        subsampling = [2 ** clip.format.subsampling_w, 2 ** clip.format.subsampling_h]
+        subsampling = [2**clip.format.subsampling_w, 2**clip.format.subsampling_h]
 
         nshift: list[list[float]] = [
             normalize_seq(sx, clip.format.num_planes),
-            normalize_seq(sy, clip.format.num_planes)
+            normalize_seq(sy, clip.format.num_planes),
         ]
 
         if not self.transpose_first:
@@ -362,13 +368,7 @@ class NNEDI3(SuperSampler):
         return self._deinterlacer_function(clip, field, dh, **self.get_deint_args(**kwargs))
 
     def get_deint_args(self, **kwargs: Any) -> dict[str, Any]:
-        return dict(
-            nsize=self.nsize,
-            nns=self.nns,
-            qual=self.qual,
-            etype=self.etype,
-            pscrn=self.pscrn
-        ) | kwargs
+        return dict(nsize=self.nsize, nns=self.nns, qual=self.qual, etype=self.etype, pscrn=self.pscrn) | kwargs
 
     @Scaler.cached_property
     def kernel_radius(self) -> int:
@@ -477,17 +477,20 @@ class EEDI2(SuperSampler):
         return self._deinterlacer_function(clip, field, **self.get_deint_args(**kwargs))
 
     def get_deint_args(self, **kwargs: Any) -> dict[str, Any]:
-        return dict(
-            mthresh=self.mthresh,
-            lthresh=self.lthresh,
-            vthresh=self.vthresh,
-            estr=self.estr,
-            dstr=self.dstr,
-            maxd=self.maxd,
-            map=self.map,
-            nt=self.nt,
-            pp=self.pp
-        ) | kwargs
+        return (
+            dict(
+                mthresh=self.mthresh,
+                lthresh=self.lthresh,
+                vthresh=self.vthresh,
+                estr=self.estr,
+                dstr=self.dstr,
+                maxd=self.maxd,
+                map=self.map,
+                nt=self.nt,
+                pp=self.pp,
+            )
+            | kwargs
+        )
 
     @Scaler.cached_property
     def kernel_radius(self) -> int:

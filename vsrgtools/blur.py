@@ -35,7 +35,8 @@ def box_blur(
     radius: int | Sequence[int] = 1,
     passes: int = 1,
     mode: OneDimConvModeT | TempConvModeT = ConvMode.HV,
-    planes: PlanesT = None, **kwargs: Any
+    planes: PlanesT = None,
+    **kwargs: Any,
 ) -> ConstantFormatVideoNode:
     """
     Applies a box blur to the input clip.
@@ -66,16 +67,17 @@ def box_blur(
 
     box_args = (
         planes,
-        radius, 0 if mode == ConvMode.VERTICAL else passes,
-        radius, 0 if mode == ConvMode.HORIZONTAL else passes
+        radius,
+        0 if mode == ConvMode.VERTICAL else passes,
+        radius,
+        0 if mode == ConvMode.HORIZONTAL else passes,
     )
 
     return clip.vszip.BoxBlur(*box_args)
 
 
 def side_box_blur(
-    clip: vs.VideoNode, radius: int | list[int] = 1, planes: PlanesT = None,
-    inverse: bool = False
+    clip: vs.VideoNode, radius: int | list[int] = 1, planes: PlanesT = None, inverse: bool = False
 ) -> ConstantFormatVideoNode:
     assert check_variable_format(clip, side_box_blur)
 
@@ -92,26 +94,27 @@ def side_box_blur(
 
     vrt_filters, hrz_filters = list[list[partial[ConstantFormatVideoNode]]](
         [
-            partial(conv_m1, mode=mode), partial(conv_m2, mode=mode),
-            partial(blur_pt, hradius=hr, vradius=vr, hpasses=h, vpasses=v)
-        ] for h, hr, v, vr, mode in [
-            (0, None, 1, radius, ConvMode.VERTICAL), (1, radius, 0, None, ConvMode.HORIZONTAL)
+            partial(conv_m1, mode=mode),
+            partial(conv_m2, mode=mode),
+            partial(blur_pt, hradius=hr, vradius=vr, hpasses=h, vpasses=v),
         ]
+        for h, hr, v, vr, mode in [(0, None, 1, radius, ConvMode.VERTICAL), (1, radius, 0, None, ConvMode.HORIZONTAL)]
     )
 
     vrt_intermediates = (vrt_flt(clip) for vrt_flt in vrt_filters)
     intermediates = list(
         hrz_flt(vrt_intermediate)
         for i, vrt_intermediate in enumerate(vrt_intermediates)
-        for j, hrz_flt in enumerate(hrz_filters) if not i == j == 2
+        for j, hrz_flt in enumerate(hrz_filters)
+        if not i == j == 2
     )
 
     comp_blur = None if inverse else box_blur(clip, radius, 1, planes=planes)
 
     if complexpr_available:
-        template = '{cum} x - abs {new} x - abs < {cum} {new} ?'
+        template = "{cum} x - abs {new} x - abs < {cum} {new} ?"
 
-        cum_expr, cumc = '', 'y'
+        cum_expr, cumc = "", "y"
         n_inter = len(intermediates)
 
         for i, newc, var in zip(count(), ExprVars[2:26], ExprVars[4:26]):
@@ -122,12 +125,12 @@ def side_box_blur(
 
             if i != n_inter - 2:
                 cumc = var.upper()
-                cum_expr += f' {cumc}! '
-                cumc = f'{cumc}@'
+                cum_expr += f" {cumc}! "
+                cumc = f"{cumc}@"
 
         if comp_blur:
             clips = [clip, *intermediates, comp_blur]
-            cum_expr = f'x {cum_expr} - {ExprVars[n_inter + 1]} +'
+            cum_expr = f"x {cum_expr} - {ExprVars[n_inter + 1]} +"
         else:
             clips = [clip, *intermediates]
 
@@ -152,7 +155,7 @@ def gauss_blur(
     taps: int | None = None,
     mode: OneDimConvModeT | TempConvModeT = ConvMode.HV,
     planes: PlanesT = None,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> ConstantFormatVideoNode:
     """
     Applies Gaussian blur to a clip, supporting spatial and temporal modes, and per-plane control.
@@ -184,6 +187,7 @@ def gauss_blur(
     taps = BlurMatrix.GAUSS.get_taps(sigma_constant, taps)
 
     if not mode.is_temporal:
+
         def _resize2_blur(plane: ConstantFormatVideoNode, sigma: float, taps: int) -> ConstantFormatVideoNode:
             resize_kwargs = dict[str, Any]()
 
@@ -203,17 +207,14 @@ def gauss_blur(
                 plane = core.resize.Bilinear(plane, wdown, hdown)
                 sigma = sigma_constant
             else:
-                resize_kwargs.update({f'force_{k}': k in mode for k in 'hv'})
+                resize_kwargs.update({f"force_{k}": k in mode for k in "hv"})
 
             return Gaussian(sigma, taps).scale(plane, **resize_kwargs | kwargs)  # type: ignore[return-value]
 
         if not {*range(clip.format.num_planes)} - {*planes}:
             return _resize2_blur(clip, sigma, taps)
 
-        return join([
-            _resize2_blur(p, sigma, taps) if i in planes else p
-            for i, p in enumerate(split(clip))
-        ])
+        return join([_resize2_blur(p, sigma, taps) if i in planes else p for i, p in enumerate(split(clip))])
 
     kernel = BlurMatrix.GAUSS(taps, sigma=sigma, mode=mode, scale_value=1023)
 
@@ -225,7 +226,7 @@ def min_blur(
     radius: int | Sequence[int] = 1,
     mode: tuple[ConvMode, ConvMode] = (ConvMode.HV, ConvMode.SQUARE),
     planes: PlanesT = None,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> ConstantFormatVideoNode:
     """
     Combines binomial (Gaussian-like) blur and median filtering for a balanced smoothing effect.
@@ -267,6 +268,7 @@ _SbrBlurT = Union[
     VSFunctionNoArgs[vs.VideoNode, vs.VideoNode],
 ]
 
+
 def sbr(
     clip: vs.VideoNode,
     radius: int | Sequence[int] = 1,
@@ -276,7 +278,7 @@ def sbr(
     planes: PlanesT = None,
     *,
     func: FuncExceptT | None = None,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> ConstantFormatVideoNode:
     """
     A helper function for high-pass filtering a blur difference, inspired by an AviSynth script by Didée.
@@ -321,30 +323,31 @@ def sbr(
 
     return norm_expr(
         [clip, diff, blurred_diff],
-        'y neutral - D1! y z - D2! D1@ D2@ xor x x D1@ abs D2@ abs < D1@ D2@ ? - ?',
-        planes=planes, func=func
+        "y neutral - D1! y z - D2! D1@ D2@ xor x x D1@ abs D2@ abs < D1@ D2@ ? - ?",
+        planes=planes,
+        func=func,
     )
 
 
 @overload
 def median_blur(
-    clip: vs.VideoNode, radius: int | Sequence[int] = 1, mode: SpatialConvModeT = ConvMode.SQUARE, planes: PlanesT = None
-) -> ConstantFormatVideoNode:
-    ...
+    clip: vs.VideoNode,
+    radius: int | Sequence[int] = 1,
+    mode: SpatialConvModeT = ConvMode.SQUARE,
+    planes: PlanesT = None,
+) -> ConstantFormatVideoNode: ...
 
 
 @overload
 def median_blur(
     clip: vs.VideoNode, radius: int = 1, mode: Literal[ConvMode.TEMPORAL] = ..., planes: PlanesT = None
-) -> ConstantFormatVideoNode:
-    ...
+) -> ConstantFormatVideoNode: ...
 
 
 @overload
 def median_blur(
     clip: vs.VideoNode, radius: int | Sequence[int] = 1, mode: ConvMode = ConvMode.SQUARE, planes: PlanesT = None
-) -> ConstantFormatVideoNode:
-    ...
+) -> ConstantFormatVideoNode: ...
 
 
 def median_blur(
@@ -385,7 +388,7 @@ def median_blur(
     for r in radius:
         expr_passes = list[str]()
 
-        for mat in ExprOp.matrix('x', r, mode, [(0, 0)]):
+        for mat in ExprOp.matrix("x", r, mode, [(0, 0)]):
             rb = len(mat) + 1
             st = rb - 1
             sp = rb // 2 - 1
@@ -420,17 +423,17 @@ class Bilateral(Generic[P, R]):
         Enum specifying which backend implementation of the bilateral filter to use.
         """
 
-        CPU = 'vszip'
+        CPU = "vszip"
         """
         Uses `vszip.Bilateral` — a fast, CPU-based implementation written in Zig.
         """
 
-        GPU = 'bilateralgpu'
+        GPU = "bilateralgpu"
         """
         Uses `bilateralgpu.Bilateral` — a CUDA-based GPU implementation.
         """
 
-        GPU_RTC = 'bilateralgpu_rtc'
+        GPU_RTC = "bilateralgpu_rtc"
         """
         Uses `bilateralgpu_rtc.Bilateral` — a CUDA-based GPU implementation with runtime shader compilation.
         """
@@ -454,7 +457,7 @@ def bilateral(
     sigmaS: float | Sequence[float] | None = None,
     sigmaR: float | Sequence[float] | None = None,
     backend: Bilateral.Backend = Bilateral.Backend.CPU,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> ConstantFormatVideoNode:
     """
     Applies a bilateral filter for edge-preserving and noise-reducing smoothing.

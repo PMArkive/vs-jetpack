@@ -11,7 +11,7 @@ from ..types import vs_object, VideoNodeT
 from . import vs_proxy as vs
 
 if TYPE_CHECKING:
-    from vapoursynth._typings import _VapourSynthMapValue  # type: ignore
+    from vapoursynth._typings import _VapourSynthMapValue
 else:
     _VapourSynthMapValue = Any
 

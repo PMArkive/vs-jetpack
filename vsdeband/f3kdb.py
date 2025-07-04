@@ -84,11 +84,11 @@ class RandomAlgo(CustomIntEnum):
         ...
 
     @overload
-    def __call__(
+    def __call__(  # type: ignore
         self: Literal[RandomAlgo.GAUSSIAN],
         sigma: float,
         /,
-    ) -> RandomAlgoWithInfo:  # type: ignore
+    ) -> RandomAlgoWithInfo:
         """
         StdDev (sigma).
         Only values in [-1.0, 1.0] is used for multiplication, numbers outside this range are simply ignored)
@@ -206,10 +206,10 @@ class F3kdb(Debander):
         debanded = core.neo_f3kdb.Deband(
             func.work_clip,
             radius,
-            y,
-            cb,
-            cr,
-            gry * 255 * 0.8,
+            y,  # type: ignore
+            cb,  # type: ignore
+            cr,  # type: ignore
+            gry * 255 * 0.8,  # type: ignore
             grc * 255 * 0.8,  # type: ignore
             sample_mode.value,
             self.seed or seed,

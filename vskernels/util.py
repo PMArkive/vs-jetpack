@@ -29,17 +29,11 @@ from vstools import (
 )
 
 from .abstract import Resampler, ResamplerLike, Scaler, ScalerLike
-from .abstract.base import BaseScaler, BaseScalerMeta, _BaseScalerT, _ScalerT
+from .abstract.base import BaseScaler, BaseScalerMeta, _BaseScalerT
 from .kernels import Catrom, Point
 from .types import Center, LeftShift, Slope, TopShift
 
-__all__ = [
-    'LinearLight',
-    'BaseScalerSpecializer',
-    'NoScale',
-
-    'resample_to'
-]
+__all__ = ["BaseScalerSpecializer", "LinearLight", "NoScale", "resample_to"]
 
 
 class BaseScalerSpecializerMeta(BaseScalerMeta):
@@ -47,7 +41,7 @@ class BaseScalerSpecializerMeta(BaseScalerMeta):
 
     __isspecialized__: bool
 
-    def __new__(
+    def __new__(  # noqa: PYI034
         mcls,
         name: str,
         bases: tuple[type, ...],
@@ -59,8 +53,8 @@ class BaseScalerSpecializerMeta(BaseScalerMeta):
     ) -> BaseScalerSpecializerMeta:
         if specializer is not None:
             name = f"{name}[{specializer.__name__}]"
-            bases = (specializer, ) + bases
-            namespace["__orig_bases__"] = (specializer, ) + namespace["__orig_bases__"]
+            bases = (specializer, *bases)
+            namespace["__orig_bases__"] = (specializer, *namespace["__orig_bases__"])
 
             del namespace["kernel_radius"]
             del namespace["_default_scaler"]
@@ -79,6 +73,7 @@ class BaseScalerSpecializer(BaseScaler, Generic[_BaseScalerT], metaclass=BaseSca
     _default_scaler: ClassVar[type[BaseScaler]]
 
     if not TYPE_CHECKING:
+
         def __new__(cls, *args: Any, **kwargs: Any) -> Self:
             if not cls.__isspecialized__:
                 return cls.__class_getitem__(cls._default_scaler)()
@@ -102,13 +97,16 @@ class BaseScalerSpecializer(BaseScaler, Generic[_BaseScalerT], metaclass=BaseSca
         :return:            A new subclass using the provided kernel.
         """
         if isinstance(base_scaler, TypeVar):
-            return GenericAlias(cls, (base_scaler, ))
+            return GenericAlias(cls, (base_scaler,))
 
         specialized_scaler = BaseScalerSpecializerMeta(
-            cls.__name__, (cls, ), cls.__dict__.copy(), specializer=base_scaler, partial_abstract=True
+            cls.__name__, (cls,), cls.__dict__.copy(), specializer=base_scaler, partial_abstract=True
         )
 
-        return GenericAlias(specialized_scaler, (base_scaler, ))
+        return GenericAlias(specialized_scaler, (base_scaler,))
+
+
+_ScalerT = TypeVar("_ScalerT", bound=Scaler)
 
 
 class NoScale(BaseScalerSpecializer[_ScalerT], Scaler, partial_abstract=True):

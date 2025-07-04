@@ -31,10 +31,11 @@ from vstools import (
 from .fft import DFTTest, SLocationT
 
 __all__ = [
-    'Prefilter', 'PrefilterPartial', 'MultiPrefilter',
-    'PrefilterLike',
-
-    'prefilter_to_full_range',
+    "MultiPrefilter",
+    "Prefilter",
+    "PrefilterLike",
+    "PrefilterPartial",
+    "prefilter_to_full_range",
 ]
 
 

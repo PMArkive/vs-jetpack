@@ -40,9 +40,7 @@ class VideoFormat:
     def __eq__(self, other: Self) -> bool: ...  # type: ignore[overload-overlap]
     @overload
     def __eq__(self, other: object) -> Literal[False]: ...
-
     def __int__(self) -> int: ...
-
 
 class ChannelLayout(int):
     def __contains__(self, layout: AudioChannels) -> bool: ...

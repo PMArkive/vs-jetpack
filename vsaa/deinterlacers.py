@@ -632,7 +632,6 @@ class EEDI3(SuperSampler):
     def antialias(
         self, clip: vs.VideoNode, direction: AntiAliaser.AADirection = AntiAliaser.AADirection.BOTH, **kwargs: Any
     ) -> ConstantFormatVideoNode:
-
         kwargs = self._set_sclip_mclip(kwargs)
 
         if self.sclip and self.double_rate:

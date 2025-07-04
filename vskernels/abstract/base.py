@@ -514,9 +514,6 @@ class Scaler(BaseScaler):
         return {"width": width, "height": height, "src_top": shift[0], "src_left": shift[1]} | self.kwargs | kwargs
 
 
-_ScalerT = TypeVar("_ScalerT", bound=Scaler)
-
-
 class Descaler(BaseScaler):
     """
     Abstract descaling interface.

@@ -74,4 +74,4 @@ class Lanczos(ZimgComplexKernel):
         return ceil(self.taps)
 
     def _pretty_string(self, **attrs: Any) -> str:
-        return super()._pretty_string(**dict(taps=self.taps) | attrs)
+        return super()._pretty_string(**{"taps": self.taps} | attrs)

@@ -5125,19 +5125,80 @@ class _Plugin_mvsf_VideoNode_Bound(Plugin):
 
 # end implementation
 
-
 # implementation: neo_f3kdb
 
 class _Plugin_neo_f3kdb_Core_Bound(Plugin):
     """This class implements the module definitions for the "neo_f3kdb" VapourSynth plugin.\n\n*This class cannot be imported.*"""
-    def Deband(self, clip: VideoNode, range: int | None = None, y: int | None = None, cb: int | None = None, cr: int | None = None, grainy: int | None = None, grainc: int | None = None, sample_mode: int | None = None, seed: int | None = None, blur_first: int | None = None, dynamic_grain: int | None = None, opt: int | None = None, mt: int | None = None, dither_algo: int | None = None, keep_tv_range: int | None = None, output_depth: int | None = None, random_algo_ref: int | None = None, random_algo_grain: int | None = None, random_param_ref: float | None = None, random_param_grain: float | None = None, preset: _DataType | None = None, y_1: int | None = None, cb_1: int | None = None, cr_1: int | None = None, y_2: int | None = None, cb_2: int | None = None, cr_2: int | None = None, scale: int | None = None, angle_boost: float | None = None, max_angle: float | None = None) -> ConstantFormatVideoNode: ...
+    def Deband(
+        self,
+        clip: VideoNode,
+        range: int | None = None,
+        y: int | None = None,
+        cb: int | None = None,
+        cr: int | None = None,
+        grainy: int | None = None,
+        grainc: int | None = None,
+        sample_mode: int | None = None,
+        seed: int | None = None,
+        blur_first: int | None = None,
+        dynamic_grain: int | None = None,
+        opt: int | None = None,
+        mt: int | None = None,
+        dither_algo: int | None = None,
+        keep_tv_range: int | None = None,
+        output_depth: int | None = None,
+        random_algo_ref: int | None = None,
+        random_algo_grain: int | None = None,
+        random_param_ref: float | None = None,
+        random_param_grain: float | None = None,
+        preset: _DataType | None = None,
+        y_1: int | None = None,
+        cb_1: int | None = None,
+        cr_1: int | None = None,
+        y_2: int | None = None,
+        cb_2: int | None = None,
+        cr_2: int | None = None,
+        scale: int | None = None,
+        angle_boost: float | None = None,
+        max_angle: float | None = None,
+    ) -> ConstantFormatVideoNode: ...
 
 class _Plugin_neo_f3kdb_VideoNode_Bound(Plugin):
     """This class implements the module definitions for the "neo_f3kdb" VapourSynth plugin.\n\n*This class cannot be imported.*"""
-    def Deband(self, range: int | None = None, y: int | None = None, cb: int | None = None, cr: int | None = None, grainy: int | None = None, grainc: int | None = None, sample_mode: int | None = None, seed: int | None = None, blur_first: int | None = None, dynamic_grain: int | None = None, opt: int | None = None, mt: int | None = None, dither_algo: int | None = None, keep_tv_range: int | None = None, output_depth: int | None = None, random_algo_ref: int | None = None, random_algo_grain: int | None = None, random_param_ref: float | None = None, random_param_grain: float | None = None, preset: _DataType | None = None, y_1: int | None = None, cb_1: int | None = None, cr_1: int | None = None, y_2: int | None = None, cb_2: int | None = None, cr_2: int | None = None, scale: int | None = None, angle_boost: float | None = None, max_angle: float | None = None) -> ConstantFormatVideoNode: ...
+    def Deband(
+        self,
+        range: int | None = None,
+        y: int | None = None,
+        cb: int | None = None,
+        cr: int | None = None,
+        grainy: int | None = None,
+        grainc: int | None = None,
+        sample_mode: int | None = None,
+        seed: int | None = None,
+        blur_first: int | None = None,
+        dynamic_grain: int | None = None,
+        opt: int | None = None,
+        mt: int | None = None,
+        dither_algo: int | None = None,
+        keep_tv_range: int | None = None,
+        output_depth: int | None = None,
+        random_algo_ref: int | None = None,
+        random_algo_grain: int | None = None,
+        random_param_ref: float | None = None,
+        random_param_grain: float | None = None,
+        preset: _DataType | None = None,
+        y_1: int | None = None,
+        cb_1: int | None = None,
+        cr_1: int | None = None,
+        y_2: int | None = None,
+        cb_2: int | None = None,
+        cr_2: int | None = None,
+        scale: int | None = None,
+        angle_boost: float | None = None,
+        max_angle: float | None = None,
+    ) -> ConstantFormatVideoNode: ...
 
 # end implementation
-
 
 _ReturnDict_nlm_cuda_Version = TypedDict(
     "_ReturnDict_nlm_cuda_Version",
@@ -5219,19 +5280,46 @@ class _Plugin_nlm_ispc_VideoNode_Bound(Plugin):
 
 # end implementation
 
-
 # implementation: noise
 
 class _Plugin_noise_Core_Bound(Plugin):
     """This class implements the module definitions for the "noise" VapourSynth plugin.\n\n*This class cannot be imported.*"""
-    def Add(self, clip: VideoNode, var: float | None = None, uvar: float | None = None, type: int | None = None, hcorr: float | None = None, vcorr: float | None = None, xsize: float | None = None, ysize: float | None = None, scale: float | None = None, seed: int | None = None, constant: int | None = None, every: int | None = None, opt: int | None = None) -> ConstantFormatVideoNode: ...
+    def Add(
+        self,
+        clip: VideoNode,
+        var: float | None = None,
+        uvar: float | None = None,
+        type: int | None = None,
+        hcorr: float | None = None,
+        vcorr: float | None = None,
+        xsize: float | None = None,
+        ysize: float | None = None,
+        scale: float | None = None,
+        seed: int | None = None,
+        constant: int | None = None,
+        every: int | None = None,
+        opt: int | None = None,
+    ) -> ConstantFormatVideoNode: ...
 
 class _Plugin_noise_VideoNode_Bound(Plugin):
     """This class implements the module definitions for the "noise" VapourSynth plugin.\n\n*This class cannot be imported.*"""
-    def Add(self, var: float | None = None, uvar: float | None = None, type: int | None = None, hcorr: float | None = None, vcorr: float | None = None, xsize: float | None = None, ysize: float | None = None, scale: float | None = None, seed: int | None = None, constant: int | None = None, every: int | None = None, opt: int | None = None) -> ConstantFormatVideoNode: ...
+    def Add(
+        self,
+        var: float | None = None,
+        uvar: float | None = None,
+        type: int | None = None,
+        hcorr: float | None = None,
+        vcorr: float | None = None,
+        xsize: float | None = None,
+        ysize: float | None = None,
+        scale: float | None = None,
+        seed: int | None = None,
+        constant: int | None = None,
+        every: int | None = None,
+        opt: int | None = None,
+    ) -> ConstantFormatVideoNode: ...
 
 # end implementation
-
 
 # implementation: placebo
 
@@ -11151,9 +11239,7 @@ class RawNode:
     def __eq__(self: Self, other: Self, /) -> bool: ...
     @overload
     def __eq__(self, other: Any, /) -> Literal[False]: ...
-
     def __hash__(self) -> int: ...
-
     def __add__(self, other: Self, /) -> Self: ...
     def __radd__(self, other: Self, /) -> Self: ...
     def __mul__(self, other: int) -> Self: ...

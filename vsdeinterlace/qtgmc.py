@@ -6,8 +6,7 @@ from jetpytools import CustomIntEnum
 from numpy import linalg, zeros
 from typing_extensions import Self
 
-from vskernels import Catrom
-from vsaa import Deinterlacer, NNEDI3
+from vsaa import NNEDI3, Deinterlacer
 from vsdeband import Grainer
 from vsdenoise import (
     DFTTest,

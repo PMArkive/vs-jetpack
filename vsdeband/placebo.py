@@ -5,7 +5,18 @@ from typing import Any, Iterable
 
 from typing_extensions import deprecated
 
-from vstools import ConstantFormatVideoNode, CustomIntEnum, KwargsT, check_variable, fallback, inject_self, join, normalize_seq, split, vs
+from vstools import (
+    ConstantFormatVideoNode,
+    CustomIntEnum,
+    KwargsT,
+    check_variable,
+    fallback,
+    inject_self,
+    join,
+    normalize_seq,
+    split,
+    vs,
+)
 
 from .abstract import Debander
 
@@ -135,9 +146,7 @@ class Placebo(Debander):
 
             return join(debs, clip.format.color_family)
 
-        plane_map = {
-            tuple(i for i in range(clip.format.num_planes) if ngrain[i] == x): x for x in set_grn - {0}
-        }
+        plane_map = {tuple(i for i in range(clip.format.num_planes) if ngrain[i] == x): x for x in set_grn - {0}}
 
         debanded = clip
         for planes, grain_val in plane_map.items():

@@ -6,8 +6,16 @@ from typing import Any, Literal, NamedTuple, NoReturn, Self, overload
 from typing_extensions import deprecated
 
 from vstools import (
-    CustomIntEnum, CustomRuntimeError, FuncExceptT, FunctionUtil, PlanesT, core, fallback, inject_self, normalize_seq,
-    vs
+    CustomIntEnum,
+    CustomRuntimeError,
+    FuncExceptT,
+    FunctionUtil,
+    PlanesT,
+    core,
+    fallback,
+    inject_self,
+    normalize_seq,
+    vs,
 )
 
 from .abstract import Debander

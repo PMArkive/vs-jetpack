@@ -5,6 +5,7 @@ from typing import Any, SupportsFloat, overload
 
 import vapoursynth as vs
 from jetpytools import fallback, mod_x
+
 from vstools import ConstantFormatVideoNode
 
 from ..enums.other import Dar, Sar

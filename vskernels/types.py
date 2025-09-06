@@ -34,8 +34,8 @@ class BorderHandling(CustomIntEnum):
     REPEAT = 2
     """Pad the border by repeating the last row/column pixels."""
 
-    SOLID = 3
-    """Pad the border with a solid color. Use BorderHandling.SOLID(color) to specify the color."""
+    COLOR = 3
+    """Pad the border with a solid color. Use BorderHandling.COLOR(color) to specify the color."""
 
     def __call__(
         self,
@@ -51,14 +51,14 @@ class BorderHandling(CustomIntEnum):
                 - MISSING: Automatically set to False if RGB, else None
                 - Sequence: RGB/YUV tuple for multi-plane formats
 
-                Note that ONLY works with BorderHandling.SOLID.
+                Note that ONLY works with BorderHandling.COLOR.
                 Other modes ignore the color parameter.
 
         Returns:
             The same BorderHandling instance with the color stored.
         """
 
-        if self is not BorderHandling.SOLID:
+        if self is not BorderHandling.COLOR:
             return self  # type: ignore
 
         self._color = color
@@ -77,7 +77,7 @@ class BorderHandling(CustomIntEnum):
                 padded = padder.COLOR(clip, pad_w, pad_w, pad_h, pad_h)
             case BorderHandling.REPEAT:
                 padded = padder.REPEAT(clip, pad_w, pad_w, pad_h, pad_h)
-            case BorderHandling.SOLID:
+            case BorderHandling.COLOR:
                 padded = padder.COLOR(clip, pad_w, pad_w, pad_h, pad_h, self._color)  # type: ignore
             case _:
                 raise CustomNotImplementedError

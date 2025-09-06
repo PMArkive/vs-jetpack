@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from functools import cache
-from typing import Any, TypeAlias, Union
+from typing import Any, Self, Sequence, TypeAlias, Union
 
-from jetpytools import CustomNotImplementedError
+from jetpytools import MISSING, CustomNotImplementedError, MissingT
 
 from vstools import CustomIntEnum, KwargsT, padder, vs
 
@@ -23,9 +23,46 @@ __all__ = [
 
 
 class BorderHandling(CustomIntEnum):
+    """Border handling modes for clip border padding."""
+
     MIRROR = 0
+    """Pad the border by mirroring the pixels at the edges."""
+
     ZERO = 1
+    """Pad the border with zeroes."""
+
     REPEAT = 2
+    """Pad the border by repeating the last row/column pixels."""
+
+    SOLID = 3
+    """Pad the border with a solid color. Use BorderHandling.SOLID(color) to specify the color."""
+
+    def __call__(
+        self,
+        color: int | float | bool | None | MissingT | Sequence[int | float | bool | None | MissingT] = (False, MISSING),
+    ) -> Self:
+        """
+        Args:
+            color: The color to use for padding. Can be:
+                - A number: Used directly without conversion
+                - True: Maximum value for the clip format and color range
+                - False: Minimum value for the clip format and color range
+                - None: Neutral value for the clip format
+                - MISSING: Automatically set to False if RGB, else None
+                - Sequence: RGB/YUV tuple for multi-plane formats
+
+                Note that ONLY works with BorderHandling.SOLID.
+                Other modes ignore the color parameter.
+
+        Returns:
+            The same BorderHandling instance with the color stored.
+        """
+
+        if self is not BorderHandling.SOLID:
+            return self  # type: ignore
+
+        self._color = color
+        return self  # type: ignore
 
     def prepare_clip(
         self, clip: vs.VideoNode, min_pad: int = 2, shift: tuple[TopShift, LeftShift] = (0, 0)
@@ -40,6 +77,8 @@ class BorderHandling(CustomIntEnum):
                 padded = padder.COLOR(clip, pad_w, pad_w, pad_h, pad_h)
             case BorderHandling.REPEAT:
                 padded = padder.REPEAT(clip, pad_w, pad_w, pad_h, pad_h)
+            case BorderHandling.SOLID:
+                padded = padder.COLOR(clip, pad_w, pad_w, pad_h, pad_h, self._color)  # type: ignore
             case _:
                 raise CustomNotImplementedError
 

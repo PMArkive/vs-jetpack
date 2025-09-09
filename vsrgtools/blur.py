@@ -19,6 +19,7 @@ from vstools import (
     SpatialConvMode,
     TempConvMode,
     VSFunctionNoArgs,
+    VSFunctionPlanesArgs,
     check_ref_clip,
     check_variable,
     check_variable_format,
@@ -29,6 +30,7 @@ from vstools import (
     join,
     normalize_planes,
     normalize_seq,
+    prefilter_process,
     split,
     vs,
 )
@@ -130,6 +132,55 @@ def side_box_blur(clip: vs.VideoNode, radius: int = 1, planes: Planes = None) ->
     )
 
 
+class GaussBlur(Generic[P, R]):
+    """
+    Class decorator that wraps the [gauss_blur][vsrgtools.gauss_blur] function
+    and extends its functionality.
+
+    It is not meant to be used directly.
+    """
+
+    def __init__(self, gauss_blur: Callable[P, R]) -> None:
+        self._func = gauss_blur
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
+        return self._func(*args, **kwargs)
+
+    def pre(
+        self,
+        clip: vs.VideoNode,
+        function: VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | VSFunctionPlanesArgs[vs.VideoNode, vs.VideoNode],
+        sigma: float | Sequence[float] = 0.5,
+        taps: int | None = None,
+        mode: OneDimConvMode | TempConvMode = ConvMode.HV,
+        planes: Planes = None,
+        **kwargs: Any,
+    ) -> vs.VideoNode:
+        """
+        Apply a Gaussian blur preprocessing pattern to a clip.
+
+        This function applies a Gaussian blur, then applies a given function to the blurred clip,
+        and finally merges the difference back to preserve detail.
+
+        Args:
+            clip: The clip to process.
+            function: A function to apply to the Gaussian-blurred clip.
+            sigma: Standard deviation of the Gaussian kernel. Can be a float or a list for per-plane control.
+            taps: Number of taps in the kernel. Automatically determined if not specified.
+            mode: Convolution mode (horizontal, vertical, both, or temporal). Defaults to HV.
+            planes: Planes to process. Defaults to all.
+            **kwargs: Additional arguments passed to the resizer or blur kernel. Specifying `_fast=True` enables fast
+                approximation.
+
+        Returns:
+            A clip with the Gaussian preprocessing pattern applied.
+        """
+        return prefilter_process(
+            clip, lambda clip, planes=planes: gauss_blur(clip, sigma, taps, mode, planes, **kwargs), function, planes
+        )
+
+
+@GaussBlur
 def gauss_blur(
     clip: vs.VideoNode,
     sigma: float | Sequence[float] = 0.5,

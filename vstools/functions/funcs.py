@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Iterable, Sequence
+from inspect import Signature
+from typing import Callable, Iterable, Sequence, TypeIs
 
 import vapoursynth as vs
 from jetpytools import FuncExcept, T, cachedproperty, fallback, iterate, kwargs_fallback, normalize_seq, to_arr
@@ -22,12 +23,20 @@ from ..enums import (
     TransferLike,
 )
 from ..exceptions import UndefinedMatrixError
-from ..types import ConstantFormatVideoNode, HoldsVideoFormat, Planes, VideoFormatLike, vs_object
+from ..types import (
+    ConstantFormatVideoNode,
+    HoldsVideoFormat,
+    Planes,
+    VideoFormatLike,
+    VSFunctionNoArgs,
+    VSFunctionPlanesArgs,
+    vs_object,
+)
 from .check import check_variable
 from .normalize import normalize_planes
 from .utils import depth, join, plane
 
-__all__ = ["FunctionUtil", "fallback", "iterate", "kwargs_fallback"]
+__all__ = ["FunctionUtil", "fallback", "iterate", "kwargs_fallback", "prefilter_process"]
 
 
 class FunctionUtil(list[int], vs_object):
@@ -375,3 +384,32 @@ class FunctionUtil(list[int], vs_object):
     def __vs_del__(self, core_id: int) -> None:
         del self.clip, self.func, self.allowed_cfamilies
         cachedproperty.clear_cache(self)
+
+
+def prefilter_process(
+    clip: vs.VideoNode,
+    pre_function: VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | VSFunctionPlanesArgs[vs.VideoNode, vs.VideoNode],
+    function: VSFunctionNoArgs[vs.VideoNode, vs.VideoNode] | VSFunctionPlanesArgs[vs.VideoNode, vs.VideoNode],
+    planes: Planes = None,
+) -> vs.VideoNode:
+    """
+    Apply a processing function on a prefiltered clip while preserving differences from the original.
+
+    Args:
+        clip: Input clip.
+        pre_function: Function applied before main processing, may accept `planes`.
+        function: Main processing function, may accept `planes`.
+        planes: Planes to process (default: all).
+
+    Returns:
+        VideoNode: The processed clip with original differences restored.
+    """
+
+    def _has_plane_arg(func: Callable[..., vs.VideoNode]) -> TypeIs[VSFunctionPlanesArgs[vs.VideoNode, vs.VideoNode]]:
+        return "planes" in Signature.from_callable(func).parameters
+
+    pref = pre_function(clip, planes=planes) if _has_plane_arg(pre_function) else pre_function(clip)
+    diff_clip = clip.std.MakeDiff(pref, planes)
+
+    processed = function(pref, planes=planes) if _has_plane_arg(function) else function(pref)
+    return processed.std.MergeDiff(diff_clip, planes)

@@ -132,8 +132,8 @@ Function that takes a VideoNode as its first argument and returns a VideoNode.
 """
 
 
-class VSFunctionPlanesArgs(VSFunctionKwArgs[VideoNodeT_contra, VideoNodeT_co], Protocol):
-    def __call__(self, clip: VideoNodeT_contra, *, planes: Planes = ..., **kwargs: Any) -> VideoNodeT_co: ...
+class VSFunctionPlanesArgs(Protocol[VideoNodeT_contra, VideoNodeT_co]):
+    def __call__(self, clip: VideoNodeT_contra, *, planes: Planes = ...) -> VideoNodeT_co: ...
 
 
 GenericVSFunction = Callable[..., VideoNodeT]

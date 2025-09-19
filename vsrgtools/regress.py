@@ -7,11 +7,10 @@ originally written for [Irozuku Sekai no Ashita kara](https://myanimelist.net/an
 
 from abc import ABC
 from contextlib import suppress
-from functools import cached_property
 from math import sqrt
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, Protocol, Sequence, TypeAlias
 
-from jetpytools import CustomRuntimeError, CustomValueError, FuncExcept, MismatchRefError, clamp
+from jetpytools import CustomRuntimeError, CustomValueError, FuncExcept, MismatchRefError, cachedproperty, clamp
 
 from vsexprtools import norm_expr
 from vskernels import LeftShift, TopShift
@@ -673,7 +672,7 @@ class ChromaReconstruct(ABC, vs_object):
 
         return recons
 
-    @cached_property
+    @cachedproperty
     def ss_shift(self) -> SubsampledShift:
         """
         Helper for handling chroma subsampling shifts.

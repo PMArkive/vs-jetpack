@@ -320,7 +320,7 @@ class QTempGaussMC(VSObject):
 
         self.clip = clip
         self.input_type = input_type
-        self.tff = clip_fieldbased.is_tff
+        self.tff = clip_fieldbased.is_tff()
         self.double_rate = self.input_type != self.InputType.REPAIR
 
         if self.clip.format.sample_type is vs.FLOAT:
@@ -328,9 +328,9 @@ class QTempGaussMC(VSObject):
                 "FLOAT input is not supported!", self.__class__, self.clip.format.sample_type
             )
 
-        if self.input_type == self.InputType.PROGRESSIVE and clip_fieldbased.is_inter:
+        if self.input_type == self.InputType.PROGRESSIVE and clip_fieldbased.is_inter():
             raise UnsupportedFieldBasedError(f"{self.input_type} incompatible with interlaced video!", self.__class__)
-        elif self.input_type in (self.InputType.INTERLACE, self.InputType.REPAIR) and not clip_fieldbased.is_inter:
+        elif self.input_type in (self.InputType.INTERLACE, self.InputType.REPAIR) and not clip_fieldbased.is_inter():
             raise UnsupportedFieldBasedError(f"{self.input_type} incompatible with progressive video!", self.__class__)
 
     def prefilter(

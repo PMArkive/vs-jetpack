@@ -154,7 +154,7 @@ class MVTools(VSObject):
         self.vectors = fallback(vectors, MotionVectors())
 
         self.fieldbased = FieldBased.from_video(clip, False, self.__class__)
-        self.clip = clip.std.SeparateFields(self.fieldbased.is_tff) if self.fieldbased.is_inter else clip
+        self.clip = clip.std.SeparateFields(self.fieldbased.is_tff()) if self.fieldbased.is_inter() else clip
 
         self.pel = pel
         self.pad = normalize_seq(pad, 2)

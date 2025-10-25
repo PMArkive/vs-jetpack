@@ -408,7 +408,7 @@ class ReconOutput(CustomIntEnum):
         elif value is None:
             return cls.NATIVE
 
-        return super().from_param(value, func_except)  # type: ignore
+        return super().from_param(value, func_except)
 
 
 @dataclass

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from enum import auto
 from typing import Any, Callable, Iterable, Literal, Protocol, Sequence, overload
 
-from jetpytools import MISSING, CustomEnum, CustomValueError, FuncExcept, MissingT, mod_x, to_arr
+from jetpytools import MISSING, CustomEnum, CustomValueError, EnumABCMeta, FuncExcept, MissingT, mod_x, to_arr
 from typing_extensions import TypeVar
 
 from vsexprtools import norm_expr
@@ -123,17 +124,16 @@ class GrainFactoryBicubic(BicubicAuto):
         super().__init__(sharp / -50 + 1, None, **kwargs)
 
 
-class AbstractGrainer:
+class AbstractGrainer(ABC):
     """
     Abstract grainer base class.
     """
 
-    def __call__(self, clip: vs.VideoNode, /, **kwargs: Any) -> vs.VideoNode | GrainerPartial:
-        """To be implemented in subclasses."""
-        raise NotImplementedError
+    @abstractmethod
+    def __call__(self, clip: vs.VideoNode, /, **kwargs: Any) -> vs.VideoNode | GrainerPartial: ...
 
 
-class Grainer(AbstractGrainer, CustomEnum):
+class Grainer(AbstractGrainer, CustomEnum, metaclass=EnumABCMeta):
     """
     Enum representing different grain/noise generation algorithms.
     """

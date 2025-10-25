@@ -4,6 +4,7 @@ This module implements prefilters for denoisers.
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from enum import auto
 from typing import Any, Literal, Sequence, cast, overload
 
@@ -12,6 +13,7 @@ from jetpytools import (
     CustomEnum,
     CustomNotImplementedError,
     CustomValueError,
+    EnumABCMeta,
     FuncExcept,
     KwargsT,
     normalize_seq,
@@ -129,14 +131,14 @@ def _run_prefilter(pref_type: Prefilter, clip: vs.VideoNode, planes: Planes, **k
     raise CustomNotImplementedError(func=pref_type, reason=pref_type)
 
 
-class AbstractPrefilter:
+class AbstractPrefilter(ABC):
+    @abstractmethod
     def __call__(
         self, clip: vs.VideoNode, planes: Planes = None, full_range: bool | float = False, **kwargs: Any
-    ) -> vs.VideoNode | PrefilterPartial:
-        raise NotImplementedError
+    ) -> vs.VideoNode | PrefilterPartial: ...
 
 
-class Prefilter(AbstractPrefilter, CustomEnum):
+class Prefilter(AbstractPrefilter, CustomEnum, metaclass=EnumABCMeta):
     """
     Enum representing available filters.
 

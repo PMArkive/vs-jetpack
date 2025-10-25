@@ -7,9 +7,9 @@ from __future__ import annotations
 import warnings
 from typing import Any, Callable, Sequence
 
-from jetpytools import CustomRuntimeError, CustomStrEnum, normalize_seq, to_arr
+from jetpytools import CustomIntEnum, CustomRuntimeError, CustomStrEnum, normalize_seq, to_arr
 
-from vstools import CustomIntEnum, Planes, core, join, normalize_planes, vs
+from vstools import Planes, core, join, normalize_planes, vs
 
 __all__ = ["nl_means"]
 

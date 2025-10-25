@@ -1,4 +1,6 @@
-from vstools import CustomEnum, CustomIntEnum, core, vs
+from jetpytools import CustomEnum, CustomIntEnum
+
+from vstools import core, vs
 
 __all__ = [
     "IVTCycles",

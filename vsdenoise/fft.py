@@ -9,6 +9,8 @@ from functools import cache
 from typing import TYPE_CHECKING, Any, Iterator, Literal, Mapping, Self, Sequence, overload
 
 from jetpytools import (
+    CustomEnum,
+    CustomIntEnum,
     CustomOverflowError,
     CustomRuntimeError,
     CustomValueError,
@@ -22,8 +24,6 @@ from jetpytools import (
 from typing_extensions import deprecated
 
 from vstools import (
-    CustomEnum,
-    CustomIntEnum,
     FieldBased,
     Planes,
     check_progressive,

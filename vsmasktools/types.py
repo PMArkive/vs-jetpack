@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Callable, Union
 
-from vstools import CustomEnum, vs
+from jetpytools import CustomEnum
+
+from vstools import vs
 
 from .abstract import GeneralMask
 from .edge._abstract import EdgeDetectLike, RidgeDetectLike

@@ -3,9 +3,9 @@ from __future__ import annotations
 from functools import cache
 from typing import Any
 
-from jetpytools import CustomNotImplementedError
+from jetpytools import CustomIntEnum, CustomNotImplementedError
 
-from vstools import CustomIntEnum, padder, vs
+from vstools import padder, vs
 
 __all__ = [
     "BorderHandling",

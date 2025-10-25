@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Callable, ClassVar, Concatenate, ParamSpec, Sequence
 
-from jetpytools import CustomOverflowError, FuncExcept, complex_hash, inject_self
+from jetpytools import CustomOverflowError, FuncExcept, complex_hash, inject_self, CustomIntEnum, CustomStrEnum
 
 from vsaa import EEDI3, NNEDI3, SangNom
 from vsexprtools import ExprOp, norm_expr
@@ -14,8 +14,6 @@ from vskernels import Catrom, Kernel, KernelLike, Point, Scaler, ScalerLike
 from vsrgtools import box_blur, gauss_blur
 from vsscale import ScalingArgs
 from vstools import (
-    CustomIntEnum,
-    CustomStrEnum,
     InvalidColorFamilyError,
     InvalidSubsamplingError,
     VSFunction,

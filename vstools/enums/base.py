@@ -3,19 +3,11 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, Iterable, Mapping, Self
 
-from jetpytools import (
-    CustomEnum,
-    CustomIntEnum,
-    CustomStrEnum,
-    CustomValueError,
-    EnumABCMeta,
-    FuncExcept,
-    classproperty,
-)
+from jetpytools import CustomIntEnum, CustomValueError, EnumABCMeta, FuncExcept, classproperty
 
 from ..vs_proxy import vs
 
-__all__ = ["CustomEnum", "CustomIntEnum", "CustomStrEnum", "PropEnum"]
+__all__ = ["PropEnum"]
 
 
 class PropEnum(CustomIntEnum, metaclass=EnumABCMeta):

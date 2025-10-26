@@ -65,7 +65,7 @@ class RescaleBase(VSObjectABC):
 
         self._field_based = FieldBased.from_param(field_based)
 
-        self._border_handling = BorderHandling(int(border_handling))
+        self._border_handling = BorderHandling.from_param(border_handling)
 
         self.__add_props = kwargs.get("_add_props")
 

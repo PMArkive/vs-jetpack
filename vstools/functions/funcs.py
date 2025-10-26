@@ -152,7 +152,7 @@ class FunctionUtil(list[int], VSObject):
             return clip
 
         if cfamily is vs.RGB:
-            if not self._matrix:
+            if self._matrix.is_unknown():
                 raise UndefinedMatrixError(
                     "You must specify a matrix for RGB to {} conversions!".format(
                         "/".join(cf.name for cf in sorted(self.allowed_cfamilies, key=lambda x: x.name))
@@ -173,7 +173,7 @@ class FunctionUtil(list[int], VSObject):
                 format=clip.format.replace(color_family=vs.RGB, subsampling_h=0, subsampling_w=0).id,
                 matrix_in=self._matrix,
                 chromaloc_in=self._chromaloc,
-                range_in=self._range_in.value_zimg if self._range_in else None,
+                range_in=self._range_in.value_zimg,
             )
 
             InvalidColorspacePathError.check(self.func, clip)
@@ -193,7 +193,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Get a list of all chroma planes in the normalised clip.
         """
-
         if self != [0] or self.norm_clip.format.num_planes == 1:
             return []
 
@@ -204,7 +203,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Get the clip's matrix.
         """
-
         return Matrix.from_param_or_video(self._matrix, self.clip, True, self.func)
 
     @cachedproperty
@@ -212,7 +210,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Get the clip's transfer.
         """
-
         return Transfer.from_param_or_video(self._transfer, self.clip, True, self.func)
 
     @cachedproperty
@@ -220,7 +217,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Get the clip's primaries.
         """
-
         return Primaries.from_param_or_video(self._primaries, self.clip, True, self.func)
 
     @cachedproperty
@@ -228,7 +224,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Get the clip's color range.
         """
-
         return ColorRange.from_param_or_video(self._range_in, self.clip, True, self.func)
 
     @cachedproperty
@@ -236,7 +231,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Get the clip's chroma location.
         """
-
         return ChromaLocation.from_param_or_video(self._chromaloc, self.clip, True, self.func)
 
     @cachedproperty
@@ -244,7 +238,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Get the clip's field order.
         """
-
         return FieldBased.from_param_or_video(self._order, self.clip, True, self.func)
 
     @property
@@ -252,7 +245,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Whether the clip is of a float sample type.
         """
-
         return self.norm_clip.format.sample_type is vs.FLOAT
 
     @property
@@ -260,7 +252,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Whether the clip is of an integer sample type.
         """
-
         return self.norm_clip.format.sample_type is vs.INTEGER
 
     @property
@@ -268,7 +259,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Whether the clip is of an HD resolution (>= 1280x720).
         """
-
         return self.norm_clip.width >= 1280 or self.norm_clip.height >= 720
 
     @property
@@ -276,7 +266,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Whether the luma gets processed.
         """
-
         return 0 in self
 
     @property
@@ -284,7 +273,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Whether luma is the only channel that gets processed.
         """
-
         return self == [0]
 
     @property
@@ -292,7 +280,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Whether any chroma planes get processed.
         """
-
         return 1 in self or 2 in self
 
     @property
@@ -300,7 +287,6 @@ class FunctionUtil(list[int], VSObject):
         """
         Whether only chroma planes get processed.
         """
-
         return self == [1, 2]
 
     @property
@@ -311,14 +297,12 @@ class FunctionUtil(list[int], VSObject):
         This means that if you pass [0, 1, 2] but passed a GRAY clip, it will only return [0].
         Similarly, if you pass GRAY and it gets converted to RGB, this will return [0, 1, 2].
         """
-
         return list({*self} - {0})
 
     def normalize_planes(self, planes: Planes) -> list[int]:
         """
         Normalize the given sequence of planes.
         """
-
         return normalize_planes(self.work_clip, planes)
 
     def with_planes(self, planes: Planes) -> list[int]:
@@ -365,5 +349,4 @@ class FunctionUtil(list[int], VSObject):
 
         Unprocessed planes will be set to the given "null" value.
         """
-
         return [x if i in self else null for i, x in enumerate(normalize_seq(seq, self.num_planes))]
